@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+  <head>
+    <!--
+    Autor: José Ramón López Guillén
+    Descripción: Tributo al juego arcade Arkanoid desarrollado por Taito en 1986
+    Wikipedia: https://es.wikipedia.org/wiki/Arkanoid
+    Versión: 2.0
+    -->
+    <meta charset="utf-8">
+	<title>Arkanoid tribute JS</title>
+	
+    <!-- JS -->
+    <script src="js/game.js"></script>
+
+    <!--Styles-->
+	<link rel="stylesheet" type="text/css" href="css/style.css" title="style"/>
+	<link rel="shorcut icon" href="assets/img/sprites/ball.png"/>
+  </head>
+
+    <body>
+        <div id="mainContainer">
+            <!-- Game Logo & game marker Section -->
+            <img id="gameLogo" src="assets/img/sprites/logo.png" alt="game logo">
+            <div id="gameMarker">
+                <p id="score">SCORE<span class="red"> 0 </span></p>
+                <P id="lives">LIVES 3</P>
+            </div>
+            
+            <!-- Game Canvas -->
+            <canvas id="myGameCanvas" width="500" height="500" class="initialGame"></canvas>
+            
+            <!-- Game Options -->
+            <div id="gameOptions">
+                <input type="button" id="newGame" value="new  game">
+                <span id="easyContainer" class="levelsContainers">
+                    <label for="easy" class="etiquetas">Facil</label> 
+                    <input type="radio" name="difficulty" id="easy" value="1" checked>
+                </span>
+                <span id="mediumContainer" class="levelsContainers">
+                    <label for="medium" class="etiquetas">Medio</label> 
+                    <input type="radio" name="difficulty" id="medium" value="2">
+                </span>
+                <span id="hardContainer" class="levelsContainers">
+                    <label for="hard" class="etiquetas">Dificil</label> 
+                    <input type="radio" name="difficulty" id="hard" value="3">
+                </span>
+            </div>
+
+            <!-- Right side Section -->
+            <input type="button" id="showGameControls" value="show   controls">
+            <input type="button" id="showArkanoidWiki" value="show   wikipedia">
+            <img id="cssBall" src="assets/img/sprites/ball.png"> <!-- CSS animation -->
+        </div>
+        
+        <!-- Preload Game audio -->
+        <audio id="gameOver" src="assets/audio/game_over.mp3"></audio>
+        <audio id="musicStartGame" src="assets/audio/Music_start_game.mp3"></audio>
+        <audio id="playerHitBall" src="assets/audio/player_hit_ball.mp3"></audio>
+        <audio id="ballHitBrick" src="assets/audio/ball_hit_brick.mp3"></audio>
+        <audio id="playerDeath" src="assets/audio/player_death.mp3"></audio>
+        <audio id="playerShotLaser" src="assets/audio/player_shoot_laser.mp3"></audio>
+        <audio id="shotExplosion" src="assets/audio/explosion.mp3"></audio>
+        <audio id="Descendingcapsule" src="assets/audio/descending_capsule.mp3"></audio>
+        <audio id="playerCollectCapsule" src="assets/audio/player_collect capsule.mp3"></audio>
+        <audio id="optionMenu" src="assets/audio/menu_option.mp3"></audio>
+    </body>
+</html>
