@@ -1,0 +1,18 @@
+{
+    "OPTION_MENU":[
+        {"TITLE": "NEW  GAME"},
+        {"TITLE": "DIFICULT"},
+        {"TITLE": "RANKING"}
+    ],
+    "DIFICULT": {
+        "TITLE": "SELECT A DIFICULT MODE",
+        "DIFICULT_MODES":[
+            {"TITLE": "EASY"},
+            {"TITLE": "MEDIUM"},
+            {"TITLE" : "HARD"}
+        ]
+    },
+    "RANKING":{
+        "TITLE" : "BEST PLAYERS SCORES"
+    }
+}

@@ -13,7 +13,10 @@
 	<title>Arkanoid tribute JS</title>
 	
     <!-- JS -->
-    <script src="js/game.js"></script>
+    <script src="js/util/tools.js" type="module"></script>
+    <script src="js/model/menu.js" type="module"></script>
+    <script src="js/game.js" type="module"></script>
+    
 
     <!--Styles-->
 	<link rel="stylesheet" type="text/css" href="css/style.css" title="style"/>
@@ -33,7 +36,7 @@
             <canvas id="myGameCanvas" width="500" height="500" class="initialGame"></canvas>
             
             <!-- Game Options -->
-            <div id="gameOptions">
+            <!--div id="gameOptions">
                 <input type="button" id="newGame" value="new  game">
                 <span id="easyContainer" class="levelsContainers">
                     <label for="easy" class="etiquetas">Facil</label> 
@@ -47,7 +50,7 @@
                     <label for="hard" class="etiquetas">Dificil</label> 
                     <input type="radio" name="difficulty" id="hard" value="3">
                 </span>
-            </div>
+            </div-->
 
             <!-- Right side Section -->
             <input type="button" id="showGameControls" value="show   controls">
