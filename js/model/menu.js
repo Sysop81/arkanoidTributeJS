@@ -105,4 +105,19 @@ export class Menu{
         }
         
     }
+
+    playAudioOpMenu(){
+        Menu.prototype.audioOpMenu.currentTime = 0;
+        Menu.prototype.audioOpMenu.play();
+    }
+
+    playAudioStartGame(){
+        Menu.prototype.audioStartGame.currentTime = 0;
+        Menu.prototype.audioStartGame.play();
+    }
+
+    static loadMenuAsset(){
+        Menu.prototype.audioOpMenu = document.getElementById("optionMenu");
+        Menu.prototype.audioStartGame = document.getElementById("musicStartGame");
+    }
 }
