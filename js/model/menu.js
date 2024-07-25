@@ -11,6 +11,16 @@ export class Menu{
         this.dificultSelected = lang.DIFICULT.DIFICULT_MODES[0].TITLE;
         this.menuIndex = 0;
         this.menuItemIndex = 0;
+        this.isAudioActive = true;
+    }
+
+    /**
+     * setAudioStatus
+     * Setter for property isAudioActive
+     * @param Boolean status 
+     */
+    setAudioStatus(status){
+        this.isAudioActive = status;
     }
 
     /**
@@ -69,7 +79,7 @@ export class Menu{
                 menuOptions = this.lang.DIFICULT.DIFICULT_MODES;
                 break;
             case 2: 
-                console.log("Ranking");
+                console.info("Selected Game Ranking");
                 menuOptions = [];
                 break;            
         }
@@ -107,11 +117,13 @@ export class Menu{
     }
 
     playAudioOpMenu(){
+        if(!this.isAudioActive) return;
         Menu.prototype.audioOpMenu.currentTime = 0;
         Menu.prototype.audioOpMenu.play();
     }
 
     playAudioStartGame(){
+        if(!this.isAudioActive) return;
         Menu.prototype.audioStartGame.currentTime = 0;
         Menu.prototype.audioStartGame.play();
     }

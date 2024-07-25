@@ -7,6 +7,7 @@
 import { loadLanguage } from "/js/util/tools.js";
 import { Menu } from "/js/model/menu.js";
 import { Brick } from "./model/brick.js";
+import { Player } from "./model/player.js";
 
 window.onload = function(){
     
@@ -24,12 +25,15 @@ window.onload = function(){
             menu = new Menu(CANVAS,CTX,LANGUAGE);
             Menu.loadMenuAsset();
             Brick.loadBrickAsset();
+            Player.loadPlayerAsset();
+
             
             // Step 2. Show the game option menu
             idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
             
             // Step 3. Handlers
-            document.addEventListener("keydown",manageMenu,false)
+            document.addEventListener("keydown",manageKeyDown,false)
+            document.addEventListener("keyup",manageKeyUp,false)
             
         })
         .catch(error => {
@@ -47,15 +51,18 @@ window.onload = function(){
 
         // Draw brick wall
         Brick.draw(CTX, bricks);
+
+        // Draw player
+        player.draw(CTX);
     }
 
     
     /**
-     * manageMenu [Handler]
-     * Manage gameMenu option
+     * manageKeyDown [Handler]
+     * Manage key down listener on the game
      * @param evt
      */
-    function manageMenu(evt){
+    function manageKeyDown(evt){
         switch (evt.keyCode) {
 			case 13:
                 // ENTER
@@ -66,6 +73,9 @@ window.onload = function(){
                     console.log("Start a new game with dificulty -> " + menu.dificultSelected);
                     // Load the bricks wall
                     bricks = Brick.buildBrickWall(menu.dificultSelected,LANGUAGE);
+                    // Build the player.
+                    player = new Player(CANVAS,menu.dificultSelected,LANGUAGE);
+
                     // Clean a menu interval, and set a new interval with the transition to start a new game.
                     clearInterval(idGame);
                     idGame = setInterval(outWallpaper,frameRate);   
@@ -87,17 +97,44 @@ window.onload = function(){
                 menu.menuSelected = LANGUAGE.OPTION_MENU[menu.menuItemIndex].TITLE;
                 menu.menuIndex = 0;
                 break;
+            case 37:
+                // Left arrow (Player)
+                Player.prototype.xLeft = true;
+                break;    
 			case 38:
                 // Up arrow
                 menu.playAudioOpMenu();
                 menu.manageOpMenu(false)
                 break;
+            case 39:
+                // Right arrow
+                Player.prototype.xRight = true;
+                break;    
             case 40:
                 // Down arrow
                 menu.playAudioOpMenu();
                 menu.manageOpMenu(true)
                 break; 
         }        
+    }
+
+
+    /**
+     * manageKeyUp [Handler]
+     * Manage key up listener on the game
+     * @param evt
+     */
+    function manageKeyUp(evt){
+        switch (evt.keyCode) {
+			case 37: 
+                // Left arrow
+                Player.prototype.xLeft = false;
+			    break;
+			case 39:
+                // Right arrow   
+                Player.prototype.xRight = false;
+			    break;
+        }
     }
     
     
@@ -123,9 +160,14 @@ window.onload = function(){
             document.getElementById("gameMarker").setAttribute("style",
                 `background-image: linear-gradient(${gradients[numeroDeFondo - 1]});`);
 
-            // *** TODO [CHECKING] Draw all
+            // *** TODO [CHECKING] 
+            
+            // Desactivate audio menu.
+            menu.setAudioStatus(false);
+
             // Draw a brick wall
             Brick.draw(CTX, bricks);    
+            player.draw(CTX);
 					
 			// End the interval outWallpaper
 			clearInterval(idGame);
@@ -163,7 +205,7 @@ window.onload = function(){
 
     var LANGUAGE = undefined;
     const CANVAS = document.getElementById("myGameCanvas");
-    let CTX = CANVAS.getContext("2d");
+    const CTX = CANVAS.getContext("2d");
     let frameRate = 50;
     let canvasOpacity = 100;
     let gradients = ["",
@@ -177,10 +219,8 @@ window.onload = function(){
     let idGame = undefined;
     let menu = undefined;
     let bricks = undefined;
+    let player = undefined;
        
     
     initialize();    
-    
-    
-
 }
