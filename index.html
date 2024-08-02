@@ -1,73 +1,54 @@
-<!DOCTYPE html>
-
-<html lang="es">
-
+<!doctype html>
+<html lang="en">
   <head>
-    <!--
-    Autor: José Ramón López Guillén
-    Descripción: Tributo al juego arcade Arkanoid desarrollado por Taito en 1986
-    Wikipedia: https://es.wikipedia.org/wiki/Arkanoid
-    Versión: 2.0
-    -->
+    <!------------------------------------------------------------------------------------
+        Autor: José Ramón López Guillén
+        Descripción: Tributo al juego arcade Arkanoid desarrollado por Taito en 1986
+        Wikipedia: https://es.wikipedia.org/wiki/Arkanoid
+        Versión: 2.0
+    -------------------------------------------------------------------------------------->
+
+    <!-- Required meta tags -->
     <meta charset="utf-8">
-	<title>Arkanoid tribute JS</title>
-	
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <!-- JS -->
-    <script src="js/util/tools.js" type="module"></script>
-    <script src="js/model/menu.js" type="module"></script>
     <script src="js/game.js" type="module"></script>
-    
 
-    <!--Styles-->
-	<link rel="stylesheet" type="text/css" href="css/style.css" title="style"/>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" 
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="css/style.css" title="style"/>
 	<link rel="shorcut icon" href="assets/img/sprites/ball.png"/>
-  </head>
 
-    <body>
-        <div id="mainContainer">
-            <!-- Game Logo & game marker Section -->
-            <img id="gameLogo" src="assets/img/sprites/logo.png" alt="game logo">
+    <title>Arkanoid tribute JS</title>
+  </head>
+  <body class="container black">
+    <div class="row mt-2">
+        <div class="col-12">
+            <!-- Game Marker-->
             <div id="gameMarker">
                 <p id="score">SCORE<span class="red"> 0 </span></p>
                 <P id="lives">LIVES 3</P>
             </div>
             
             <!-- Game Canvas -->
-            <canvas id="myGameCanvas" width="500" height="500" class="game0"></canvas>
-            
-            <!-- Game Options -->
-            <!--div id="gameOptions">
-                <input type="button" id="newGame" value="new  game">
-                <span id="easyContainer" class="levelsContainers">
-                    <label for="easy" class="etiquetas">Facil</label> 
-                    <input type="radio" name="difficulty" id="easy" value="1" checked>
-                </span>
-                <span id="mediumContainer" class="levelsContainers">
-                    <label for="medium" class="etiquetas">Medio</label> 
-                    <input type="radio" name="difficulty" id="medium" value="2">
-                </span>
-                <span id="hardContainer" class="levelsContainers">
-                    <label for="hard" class="etiquetas">Dificil</label> 
-                    <input type="radio" name="difficulty" id="hard" value="3">
-                </span>
-            </div-->
+            <canvas id="myGameCanvas" class="game0"></canvas>
 
-            <!-- Right side Section -->
-            <input type="button" id="showGameControls" value="show   controls">
-            <input type="button" id="showArkanoidWiki" value="show   wikipedia">
-            <img id="cssBall" src="assets/img/sprites/ball.png"> <!-- CSS animation -->
+            <!-- Game audio -->
+            <audio id="gameOver" src="assets/audio/game_over.mp3"></audio>
+            <audio id="musicStartGame" src="assets/audio/Music_start_game.mp3"></audio>
+            <audio id="playerHitBall" src="assets/audio/player_hit_ball.mp3"></audio>
+            <audio id="ballHitBrick" src="assets/audio/ball_hit_brick.mp3"></audio>
+            <audio id="ballOut" src="assets/audio/ball_out.mp3"></audio>
+            <audio id="playerShotLaser" src="assets/audio/player_shoot_laser.mp3"></audio>
+            <audio id="shotExplosion" src="assets/audio/explosion.mp3"></audio>
+            <audio id="Descendingcapsule" src="assets/audio/descending_capsule.mp3"></audio>
+            <audio id="playerCollectCapsule" src="assets/audio/player_collect capsule.mp3"></audio>
+            <audio id="optionMenu" src="assets/audio/menu_option.mp3"></audio>
         </div>
-        
-        <!-- Preload Game audio -->
-        <audio id="gameOver" src="assets/audio/game_over.mp3"></audio>
-        <audio id="musicStartGame" src="assets/audio/Music_start_game.mp3"></audio>
-        <audio id="playerHitBall" src="assets/audio/player_hit_ball.mp3"></audio>
-        <audio id="ballHitBrick" src="assets/audio/ball_hit_brick.mp3"></audio>
-        <audio id="playerDeath" src="assets/audio/player_death.mp3"></audio>
-        <audio id="playerShotLaser" src="assets/audio/player_shoot_laser.mp3"></audio>
-        <audio id="shotExplosion" src="assets/audio/explosion.mp3"></audio>
-        <audio id="Descendingcapsule" src="assets/audio/descending_capsule.mp3"></audio>
-        <audio id="playerCollectCapsule" src="assets/audio/player_collect capsule.mp3"></audio>
-        <audio id="optionMenu" src="assets/audio/menu_option.mp3"></audio>
-    </body>
+    </div>
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+  </body>
 </html>

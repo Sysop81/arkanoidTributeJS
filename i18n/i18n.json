@@ -1,4 +1,8 @@
 {
+    "GAME_MARKER":{
+        "SCORE" : "SCORE",
+        "LIVES" : "LIVES"
+    },
     "OPTION_MENU":[
         {"TITLE": "NEW  GAME"},
         {"TITLE": "DIFICULT"},
@@ -14,5 +18,12 @@
     },
     "RANKING":{
         "TITLE" : "BEST PLAYERS SCORES"
+    },
+    "PLAYER_MSG":{
+        "RESET_GAME": "PRESS  'R' KEY   TO  RESTART",
+        "START_GAME": "PRESS    SPACE   TO  START",
+        "WIN" : " !! YOU   WIN   !!",
+        "GAME_OVER" : [" GAME ", " OVER "],
+        "WEAPONS" : "PRESS  Z   TO  SHOOT"
     }
 }

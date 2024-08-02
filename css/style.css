@@ -1,109 +1,37 @@
-
 #myGameCanvas {
+	width: 100%;
+	height: 90vh;
 	border: solid 1px #ccc;
-	margin-top: 0;
-	margin-left: 100px;
-	margin-right:20px;
-	z-index: 1000;
+	background-size: cover;
+	border-radius: 0 0 5px 5px;
 }
 
 #gameMarker{
-	width:501px;
-	height:40px;
+	width: 100%;
+	height: 50px;
 	background:#0066CC;
-	margin-top: -5px;
-	margin-left:100px;
-	margin-bottom: 0;
 	border: 1px solid #ffffff;
 	overflow: hidden;
+	border-radius: 5px 5px 0 0;
 }
 
-#mainContainer{
-	width: 700px;
-	height: 800px;
-	border: 4px solid red;
-	background-color: black;
-}
-
-#gameLogo{
-	width: 500px;
-	display: block;
-	margin: auto;
-	padding-bottom: 5px;
-}
-
-#newGame{
-	border: 2px solid white;
-	font-family: arcade,sans-serif;
-	font-size: 20px;
+#score, #lives{
+	font-size: 35px;
+	font-family: arcade, sans-serif;
 	color: white;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	padding-right: 20px;
-	padding-left: 20px;
-	background-color: black;
-	margin: auto;
-	display: block;
 }
 
-#newGame:hover{
-	border: 2px solid black;
-	color: black;
-	background: white;
-}
-
-#gameOptions{
-	width:501px;
-	height:80px;
-	background: #0066cc;
-	margin-top: -5px;
-	margin-left:100px;
-	padding-top: 5px;
-	border: 1px solid #ffffff;
-}
-
-#easyContainer{
-	margin-left: 65px;
-	background: #008000;
-	padding: 2px;
-}
-
-#easyContainer:hover{
-	background: #014201;
-}
-
-#mediumContainer{
-	background: #efa355;
-	padding: 2px;
-}
-
-#mediumContainer:hover{
-	background: #876039;
-}
-
-#hardContainer{
-	background: red;
-	padding: 2px;
-}
-
-#hardContainer:hover{
-	background: darkred;
-}
-
-.levelsContainers{
+#score{
+	margin-left: 2%;
 	float: left;
-	border: 2px solid white;
-	margin-top: 15px;
-	margin-right: 20px;
-	width: 100px;
-	text-align: center;
-	font-family: arcade,sans-serif;
-	font-size: 18px;
-	color: #ffffff;
+}
+
+#lives{
+	margin-right: 2%;
+	float: right;
 }
 
 /* Wallpapers */
-
 .game0{
  background: url("../assets/img/wallpapers/w_home.png");
 }
@@ -140,94 +68,19 @@
 	background: url("../assets/img/wallpapers/w_sun_tapestry.png");
 }
 
-#score, #lives{
-	font-size: 35px;
-	font-family: arcade, sans-serif;
-	color: white;
-}
-
-#score{
-	margin-top: 4px;
-	margin-left: 2px;
-	float: left;
-}
-
-#lives{
-	margin-top: 2px;
-	margin-right: 2px;
-	float: right;
-}
 
 
+/* Arcade Font */
 @font-face {
 	font-family: arcade;
 	src: url("../assets/typography/ArcadeClassic.ttf");
 }
 
+/* Colors */
 .red{
 	color: red;
 }
 
-
-#cssBall{
-	position: fixed;
-	left: 350px;
-	top: 0;
-	z-index: 1;
-
-	animation-name: ballKayFrameAnimation;
-	animation-duration: 5s;
-	animation-timing-function: linear;
-	animation-direction: normal;
-	animation-iteration-count: initial;
-	animation-fill-mode: forwards;
+.black{
+	background-color:black !important;
 }
-
-
-@keyframes ballKayFrameAnimation {
-	0%  { left: 50px;   top: -80px; }
-	40% { left: 50px; top: 400px; }
-	60% { left: 50px; top: 800px; }
-	80% { left: 80px; top: 750px; }
-	100%{ left: 110px; top: 800px; }
-
-}
-
-/* Right side Section */
-
-#showGameControls , #showArkanoidWiki{
-	border: 2px solid white;
-	font-family: arcade,sans-serif;
-	font-size: 20px;
-	color: white;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	padding-right: 20px;
-	padding-left: 20px;
-	background-color: black;
-	position: absolute;
-	left: 520px;
-	transform: rotate(-90deg);
-}
-
-#showGameControls{
-	top: 300px;
-	
-}
-
-
-#showArkanoidWiki{
-	top: 575px;
-}
-
-#showGameControls:hover,
-#showArkanoidWiki:hover{
-	border: 2px solid black;
-	color: black;
-	background: white;
-}
-
-
-
-
-
