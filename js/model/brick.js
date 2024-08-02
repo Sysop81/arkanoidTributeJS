@@ -47,10 +47,14 @@ export class Brick{
      * @param lang 
      * @returns aray with the brick wall to draw in canvas
      */
-    static buildBrickWall(gameMode,lang){
+    static buildBrickWall(canvas,gameMode,lang){
         	
         let arraySpecialMode;                   // This array contains the positions to draw the wall bricks in martianMode or JRMode
-        let rowsBrickWall = 21;                 // Rows with bricks to build a wall bricks of the game. DEFAULT EASY MODE with 3 rows [7 bricks for row] (3 * 7 = 21)
+        //let rowsBrickWall = 21;                 // Rows with bricks to build a wall bricks of the game. DEFAULT EASY MODE with 3 rows [7 bricks for row] (3 * 7 = 21)
+        let bricksForRow = Math.floor(canvas.width  / 66.0);
+        const RESIDUAL_SPACE = canvas.width - (bricksForRow * 66.0); // TODO COMPLETE THIS METHOD IN MEDIUM AND HARD MODES
+        console.log("RESIDUO: -> " + RESIDUAL_SPACE)
+        let bricksRows = 3;
         Brick.prototype.jrModeScore = 0;        // Reset JR Mode score
         Brick.prototype.martianModeScore = 0;   // Reset Martian Mode score
     
@@ -85,7 +89,7 @@ export class Brick{
         }
 
         // Return a builded brickWall to draw in canvas
-        return Brick.#generateBrickWall(rowsBrickWall,arraySpecialMode);
+        return Brick.#generateBrickWall(RESIDUAL_SPACE,bricksForRow,bricksRows,arraySpecialMode);
     }
 
     /**
@@ -145,10 +149,13 @@ export class Brick{
      * @param arraySpecialMode 
      * @returns array with brick wall
      */
-    static #generateBrickWall(rowsBrickWall,arraySpecialMode){
+    static #generateBrickWall(RESIDUAL_SPACE,bricksOfRows,bricksRows,arraySpecialMode){ // rowsBrickWall
+        console.log(" bricksOfRows " + bricksOfRows + " bricksRows : " + bricksRows)
+        console.log("se construiran ->" + (bricksOfRows * bricksRows) + " ladrillos");
+        const BRICKS_WALL = bricksOfRows * bricksRows;
         // Internal vars
         let arrayBricks = [];
-        let positionX = 15;              // Left margin of each row of bricks that will be drawed on the screen
+        let positionX = RESIDUAL_SPACE / 2 //0;//15;              // Left margin of each row of bricks that will be drawed on the screen
         const MARGIN_BETWEEN_BRICKS = 2; // Margin between each of the bricks, so that they are not drawed together or joined
         const BRICK_SIZE_X = 64;         // X Brick size
         
@@ -158,17 +165,17 @@ export class Brick{
         let cont = 0;                    // Counter to control the brick of each row.
         let index = 0;                   // Contains the value of the index of arrayPosicionesXsprite 
                                          // (as many positions as rows exist depending on the difficulty, this array contains values ​​between 0-3)
-        const BRICKS_ROW = 7;            // Number of bricks for each row
+        //const BRICKS_ROW = 7;            // Number of bricks for each row
 
         // Set the random brick to contains the capsule to activate the shots.
-        const IS_BRICK_WITH_WEAPON_CAPSULE = Math.round(Math.random()*((rowsBrickWall-1)-0) + 0);
+        const IS_BRICK_WITH_WEAPON_CAPSULE = Math.round(Math.random()*((BRICKS_WALL-1)-0) + 0); // rowsBrickWall
             
         
         //Llamamos a la funcion encargada de definir las posiciones a recortar en cada fila, pasando el numero de filas que vamos a pintar
-        const ARRAY_X_POSITIONS_OF_SPRITE = Brick.#getSpritePosition(rowsBrickWall);
+        const ARRAY_X_POSITIONS_OF_SPRITE = Brick.#getSpritePosition(BRICKS_WALL); // rowsBrickWall
 
         // Building a brick wall
-        for (let i = 0; i < rowsBrickWall; i++){
+        for (let i = 0; i < BRICKS_WALL; i++){ //rowsBrickWall
             // Update counter and instantiate a new object for brick wall
             cont++;
             arrayBricks.push(new Brick(positionX,positionY, Brick.prototype.animation[ARRAY_X_POSITIONS_OF_SPRITE[index]][0]));
@@ -189,11 +196,12 @@ export class Brick{
             }
     
             //Recalculate the X position
+            console.log("index -> " + i + " positionX -> " + positionX);
             positionX = positionX + BRICK_SIZE_X + MARGIN_BETWEEN_BRICKS;
             
             // This conditional reset all values to start a new row brick 
-            if (cont == BRICKS_ROW){                                                                 
-                positionX = 15;                                               // Reset the X position because is the start of each row of wall
+            if (cont == bricksOfRows/*BRICKS_ROW*/){                                                                 
+                positionX = RESIDUAL_SPACE / 2//0//15;                        // Reset the X position because is the start of each row of wall
                 positionY = positionY + BRICK_SIZE_Y + MARGIN_BETWEEN_BRICKS; // Update the Y position for new row of brick wall
                 cont = 0;                                                     // Reset row bricks counter. Controls of the brick of each row 
                 index ++;                                                     // 3, 5 or 7 rows. Depending of the game mode selected. 

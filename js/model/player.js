@@ -14,8 +14,9 @@ export class Player{
         this.positionXsprite = playerOptions.posX   // Sprite X position "always zero"
         this.positionYsprite = playerOptions.posY   // Sprite Y position "based on gameMode dificult"
         this.x = (canvas.width-this.playerSizeX)/2  // Default initial X position to draw a player
-        this.y = this.#getYposition();              // Dfault initial Y position to draw a player 
+        this.y = this.#getYposition();              // Default initial Y position to draw a player 
         this.lives = 3;                             // Default initial lives of player
+        this.score = 0;                             // Default initial score of player
     }
     
     
@@ -48,6 +49,19 @@ export class Player{
         }
     }
 
+
+    /**
+     * updateLives
+     * This method update a number of lives of the player.
+     *  -> ball out : subtract a live
+     *  -> extra live trick : add a live
+     * @param isBallOut true or false
+     * @param value 
+     */
+    updateLives(isBallOut, value = undefined){
+        this.lives = value == undefined || value == null ? isBallOut ? this.lives - 1 : this.lives + 1 : value; 
+    }
+
     /**
      * draw
      * this method draw the player on game canvas
@@ -75,6 +89,29 @@ export class Player{
 			this.y,	                  // Display Y position to draw a player
 			this.playerSizeX,		  // Player X size to draw 
 			this.playerSizeY);        // Player Y size to draw
+    }
+
+    /**
+     * hitBall
+     * This method determines if player hits the ball
+     * @param ball  
+     * @returns true or false
+     */
+    hitBall(ball){
+        
+        // Get the player collider sizes 
+		let pLeft = Math.round(this.x,0);
+		let pRight = Math.round(this.x + this.playerSizeX,0);
+		let pBottom = Math.round(this.y,0);
+		let pTop = Math.round(this.y + this.playerSizeY,0);
+		
+		// Get the ball collidet sizes 
+		let bLeft = ball.x;
+		let bRight = ball.x + ball.ballSizeX; 
+		let bBottom = ball.y;
+		let bTop = ball.y + ball.ballSizeY; //23;
+		
+        return pLeft < bRight && pRight > bLeft && pTop > bBottom && pBottom < bTop;    
     }
     
      

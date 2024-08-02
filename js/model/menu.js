@@ -37,19 +37,21 @@ export class Menu{
      */
     drawMenuOption(){
         
-        this.ctx.font ="24px arcade";   
+        this.ctx.font ="34px arcade";   
 		this.ctx.fillStyle="#FFFFFF"; 
 
         let menuOptions = this.getMenuItems();
-        let height = 250;
+        let height = this.canvas.height / 2;
+        let widthMid = this.canvas.width / 2;
+        const WIDTH = (this.canvas.width / 2) - ((this.canvas.width / 2) / 4);
 
         if(this.menuIndex > 0){
-            this.ctx.fillText(this.menuIndex == 1 ? this.lang.DIFICULT.TITLE : this.lang.RANKING.TITLE, 130, height);
+            this.ctx.fillText(this.menuIndex == 1 ? this.lang.DIFICULT.TITLE : this.lang.RANKING.TITLE,WIDTH, height);
             height += 30;
         }
 
         for(let i = 0; i < menuOptions.length;i++){
-            this.ctx.fillText(this.isOpMenuSelected(menuOptions[i].TITLE), 180, height); 
+            this.ctx.fillText(this.isOpMenuSelected(menuOptions[i].TITLE),WIDTH, height); 
             height += 30;
         }
     }
