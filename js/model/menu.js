@@ -39,21 +39,42 @@ export class Menu{
         
         this.ctx.font ="34px arcade";   
 		this.ctx.fillStyle="#FFFFFF"; 
-
         let menuOptions = this.getMenuItems();
+        
+        // Position measures to draw logo and menu options 
         let height = this.canvas.height / 2;
-        let widthMid = this.canvas.width / 2;
         const WIDTH = (this.canvas.width / 2) - ((this.canvas.width / 2) / 4);
+        const VALUE_TO_INCREASE = 30;
+
+        this.drawLogo((WIDTH - 300), 200);
 
         if(this.menuIndex > 0){
             this.ctx.fillText(this.menuIndex == 1 ? this.lang.DIFICULT.TITLE : this.lang.RANKING.TITLE,WIDTH, height);
-            height += 30;
+            height += VALUE_TO_INCREASE;
         }
 
         for(let i = 0; i < menuOptions.length;i++){
             this.ctx.fillText(this.isOpMenuSelected(menuOptions[i].TITLE),WIDTH, height); 
-            height += 30;
+            height += VALUE_TO_INCREASE;
         }
+    }
+
+    /**
+     * drawLogo
+     * This method draw the game logo on menu options
+     * @param wPosition 
+     * @param hPosition 
+     */
+    drawLogo(wPosition,hPosition){
+        this.ctx.drawImage(this.image,  // Image logo
+            0,                          // Logo X position to draw 
+            0,                          // Logo Y Position to draw 
+            1750,		                // Size X of the image logo
+            500,	                    // Size Y of the image logo
+            wPosition,                  // Display X position to draw the logo
+            hPosition,	                // Display Y position to darw the logo
+            900,		                // Size X of the logo
+            300);                       // Size Y of the logo
     }
 
     /**
@@ -131,6 +152,8 @@ export class Menu{
     }
 
     static loadMenuAsset(){
+        Menu.prototype.image = new Image();
+        Menu.prototype.image.src = "../../assets/img/sprites/logo.png";
         Menu.prototype.audioOpMenu = document.getElementById("optionMenu");
         Menu.prototype.audioStartGame = document.getElementById("musicStartGame");
     }
