@@ -188,7 +188,7 @@ export class Player{
      */
     static loadPlayerAsset(){
         Player.prototype.image = new Image();
-        Player.prototype.image.src = "../../assets/img/sprites/player.png";
+        Player.prototype.image.src = `${window.location.pathname.replace(/\/$/, "")}/assets/img/sprites/player.png`; //"../../assets/img/sprites/player.png";
         Player.prototype.animation = [[0,0],[163,0],[298,0],[0,27],[163,27],[298,27]];
         Player.prototype.audioHitBall = document.getElementById("playerHitBall");
         Player.prototype.xLeft = false;
