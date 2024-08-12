@@ -80,7 +80,7 @@ export class Explosion{
       * @param {*} ctx 
       */
      static loadExplosionAsset(ctx){
-        const PATH = "../../assets/img/sprites/";
+        const PATH = `${window.location.pathname.replace(/\/$/, "")}/assets/img/sprites/`;
         Explosion.prototype.ctx = ctx;
         Explosion.prototype.imageStar = new Image();
         Explosion.prototype.imageStar.src = `${PATH}star_explosion.png`; 

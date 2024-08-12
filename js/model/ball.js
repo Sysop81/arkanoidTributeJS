@@ -152,7 +152,7 @@ export class Ball {
      */
    static loadBallAsset(){
         Ball.prototype.image = new Image();
-        Ball.prototype.image.src = "../../assets/img/sprites/balls.png";
+        Ball.prototype.image.src = `${window.location.pathname.replace(/\/$/, "")}/assets/img/sprites/balls.png`;
         Ball.prototype.animation = [[0,0],[32,0],[64,0],[96,0]]; // Red, Green, Blue, Orange
         Ball.prototype.audioHitBrick = document.getElementById("ballHitBrick");
         Ball.prototype.audioBallOut = document.getElementById("ballOut");

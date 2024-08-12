@@ -153,7 +153,7 @@ export class Menu{
 
     static loadMenuAsset(){
         Menu.prototype.image = new Image();
-        Menu.prototype.image.src = "../../assets/img/sprites/logo.png";
+        Menu.prototype.image.src = `${window.location.pathname.replace(/\/$/, "")}/assets/img/sprites/logo.png`;
         Menu.prototype.audioOpMenu = document.getElementById("optionMenu");
         Menu.prototype.audioStartGame = document.getElementById("musicStartGame");
     }

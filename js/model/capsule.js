@@ -87,7 +87,7 @@ export class Capsule{
         Capsule.prototype.canvas = canvas;
         Capsule.prototype.ctx = ctx;
         Capsule.prototype.image = new Image();
-        Capsule.prototype.image.src = "../../assets/img/sprites/shot_capsule.png";
+        Capsule.prototype.image.src = `${window.location.pathname.replace(/\/$/, "")}/assets/img/sprites/shot_capsule.png`;
         Capsule.prototype.animation = [[0,0],[44,0],[88,0],[132,0],[176,0],[220,0],[264,0],[308,0]];
         Capsule.prototype.idAnimation = undefined;
         Capsule.prototype.audioCapsuleDescending = document.getElementById("descendingcapsule");
