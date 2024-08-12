@@ -28,8 +28,6 @@ export class Ball {
         this.isBallActive = status;
     }
    
-   
-   
    /**
     * draw
     * This method draw the ball game object on game canvas
@@ -48,7 +46,6 @@ export class Ball {
                        
    }
    
-   
    /**
     * playBallHitBrickAudio
     * This method play the ball hit brick audio
@@ -57,7 +54,6 @@ export class Ball {
        Ball.prototype.audioHitBrick.currentTime = 0;
        Ball.prototype.audioHitBrick.play();
    }
-
 
    /**
     * playBallOutAudio
@@ -68,38 +64,30 @@ export class Ball {
         Ball.prototype.audioBallOut.play();
    }
 
-
    /**
     * checkBallCollider
     * This method check the all types of colliders of the ball
     * @param canvas 
     * @param player 
     */
-   checkBallCollider(canvas,player,bricks){
+   checkBallCollider(canvas,player,bricks,capsule){
         // *** Checking if ball hit a brick of brick collection
         if(this.#ballHitBricks(bricks,player)){
 
             // Show the explosion brick animation
-            let explosion = new Explosion(null,bricks[Explosion.lastHitBrickIndex].x,bricks[Explosion.lastHitBrickIndex].y);
+            let explosion = new Explosion(Explosion.EXPLOSION_TYPES.STAR,bricks[Explosion.lastHitBrickIndex].x,bricks[Explosion.lastHitBrickIndex].y);
             if(explosion.idAnimationStar == undefined){
-                explosion.idAnimationStar = setInterval(explosion.loadStarAnimate.bind(explosion),10);
+                explosion.idAnimationStar = setInterval(explosion.loadAnimate.bind(explosion),10);
             } 
 					
-            /*   TODO COMPLETE THIS -> Capsule animation
 			// Check if hit brick contains the weapon capsule
-			if(bricks[Explosion.lastHitBrickIndex].isCapsuleInside){
-				// Create a weapon capsule game object
-                capsule = new Capsule(bricks[Explosion.lastHitBrickIndex].x, bricks[Explosion.lastHitBrickIndex].y); 
-
+			if(bricks[Explosion.lastHitBrickIndex].isCapsuleInside){  
 				// Play the audio sound
-				capsule.playDescentAudio();
-			}
+				capsule.playCapsuleDescendingAudio();
 
-			//Load the animation
-			if (idFinalizarCapsula == undefined){
-				capsule.idAnimation = setInterval(capsule.loadAnimation,bind(capsule), 10);
+                // Load animation
+                capsule.idAnimation = setInterval(capsule.loadAnimation.bind(capsule), 10);
 			}
-            */
 
             // Mark a brick as broken
             bricks[Explosion.lastHitBrickIndex].brokenBrick = true;
@@ -141,6 +129,12 @@ export class Ball {
             // Play ball out audio
             this.playBallOutAudio();
 
+            // Load Death animation
+            let deathExplosion = new Explosion(Explosion.EXPLOSION_TYPES.DEATH, ((canvas.width / 2) - 150), canvas.height - 200);
+            if(deathExplosion.idAnimationDeath == undefined){
+                deathExplosion.idAnimationDeath = setInterval(deathExplosion.loadAnimate.bind(deathExplosion),10);
+            } 
+
             // Update the player lives
             player.updateLives(true);
 
@@ -151,7 +145,6 @@ export class Ball {
 		this.x += this.reboundAngleX;
 		this.y += this.reboundAngleY;
    }
-   
    
    /**
      * loadPlayerAsset
@@ -200,7 +193,6 @@ export class Ball {
 			}
 		}
     }
-
 
     /**
      * changeBallColor [Private]

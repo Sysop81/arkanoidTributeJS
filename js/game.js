@@ -10,6 +10,8 @@ import { Brick } from "./model/brick.js";
 import { Player } from "./model/player.js";
 import { Ball } from "./model/ball.js";
 import { Explosion } from "./model/explosion.js";
+import { Capsule } from "./model/capsule.js";
+import { Shot } from "./model/shot.js";
 
 window.onload = function(){
     
@@ -32,21 +34,23 @@ window.onload = function(){
             Player.loadPlayerAsset();
             Ball.loadBallAsset();
             Explosion.loadExplosionAsset(CTX);
+            Capsule.loadCapsuleAsset(CANVAS,CTX);
+            Shot.loadShotAsset(CANVAS,CTX);
 
             
             // Step 2. Show the game option menu
             idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
             
             // Step 3. Handlers
-            document.addEventListener("keydown",manageKeyDown,false)
-            document.addEventListener("keyup",manageKeyUp,false)
+            document.addEventListener('keydown',manageKeyDown,false);
+            document.addEventListener('keyup',manageKeyUp,false);
+            document.addEventListener('keypress',manageKeyPress,true);
             window.addEventListener('resize', setCanvasMeasures(CANVAS));
             
         })
         .catch(error => {
             console.error('Error loading language:', error);
         });
-
     }
 
     /**
@@ -54,8 +58,6 @@ window.onload = function(){
      * This is the main function that updates all game object
      */
     function gameLoop(){
-        console.log("The game is running!!!!");
-        
         // Clear canvas
         CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
 
@@ -72,8 +74,33 @@ window.onload = function(){
         if(!checkGameStatus()){
             // Check the ball moving
             if(ball.isBallActive){
-                ball.checkBallCollider(CANVAS,player,bricks);
+                ball.checkBallCollider(CANVAS,player,bricks,capsule);
                 updateGameMarker();
+
+                if(capsule.isEnabled && player.getShotCapsule(capsule)){
+                    // Plays player get capsule audio
+                    capsule.playGetCapsuleAudio();
+
+                    // Destroy capsule.
+                    capsule.destroy();
+                    
+                    // Activate the player shot && set timeout to end the shooting time
+                    player.activateShots(true);
+                    setTimeout(()=>{
+                        player.activateShots(false);
+                        player.setSpriteAnimation(menu.dificultSelected,LANGUAGE,false);
+                    },PLAYER_SHOOTING_TIME);
+
+                    
+                    // Change a player sprite
+                    player.setSpriteAnimation(menu.dificultSelected,LANGUAGE,true);
+                }
+                
+                // Check if player shots is enabled
+                if(player.isShotActivate){
+                    showGameMsg(LANGUAGE.PLAYER_MSG.WEAPONS);
+                    Shot.moveShots(bricks,player);
+                }
 
             }else{
                 // Game is Stopped
@@ -92,7 +119,7 @@ window.onload = function(){
         let isStop = false;
         let msg = LANGUAGE.PLAYER_MSG.GAME_OVER;
         if(player.lives == 0) isStop = true;
-        if(player.lives > 0 && player.score == bricks.length * 10){ // NOT VALID TO SPECIALS MODES
+        if(player.lives > 0 && player.score == bricks.length * 10){ // [NOT VALID TO SPECIALS MODES]
             msg = LANGUAGE.PLAYER_MSG.WIN;
             isStop = true;
         }
@@ -100,7 +127,7 @@ window.onload = function(){
         if(isStop){
             clearInterval(idGame);
             idGame = undefined;
-            console.log("The game is over");
+            console.log("GAME OVER");
             showGameMsg(msg);
         }
 
@@ -122,11 +149,10 @@ window.onload = function(){
      */
     function setPlayerAndBallTogether(){
         if(!ball.isBallActive){
-            ball.x = (player.x + player.playerSizeX/2) - ball.ballSizeX/2;  // Set the bal in the middle of player 
+            ball.x = (player.x + player.playerSizeX/2) - ball.ballSizeX/2;  // Set the ball in the middle of player 
 			ball.y = player.y - player.playerSizeY; 
         }
     }
-
 
     /**
      * showGameMsg
@@ -176,6 +202,7 @@ window.onload = function(){
                     console.log("Start a new game with dificulty -> " + menu.dificultSelected);
                     // Load the bricks wall
                     bricks = Brick.buildBrickWall(CANVAS,menu.dificultSelected,LANGUAGE);
+
                     // Build the player.
                     player = new Player(CANVAS,menu.dificultSelected,LANGUAGE);
 
@@ -193,7 +220,7 @@ window.onload = function(){
                     menu.menuSelected = menu.dificultSelected;
                 }else if(menu.menuSelected == LANGUAGE.OPTION_MENU[2].TITLE){
                     // *** RANKING
-                    console.log("show rankings");    
+                    console.log("show rankings. [DISABLED OPTION]");    
                     menu.menuIndex = 2;
                 }
                 break;
@@ -232,22 +259,6 @@ window.onload = function(){
         }        
     }
 
-
-    /**
-     * restartGame
-     * This function restart the game
-     */
-    function restartGame(){
-        if(idGame == undefined){
-            document.getElementById("lives").innerHTML = `${LANGUAGE.GAME_MARKER.LIVES}  3`; 
-            document.getElementById("score").firstElementChild.innerHTML = 0;  
-            CANVAS.setAttribute("class","game0");
-            idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
-        }
-            
-    }
-
-
     /**
      * manageKeyUp [Handler]
      * Manage key up listener on the game
@@ -265,7 +276,34 @@ window.onload = function(){
 			    break;
         }
     }
-    
+
+    /**
+     * manageKeyPress
+     * Manage key press event on the game
+     * @param {*} evt 
+     */
+    function manageKeyPress(evt){
+        // Z key [WEAPON key]
+        if (player != undefined && player.isShotActivate && (evt.charCode == 122 || evt.charCode == 90)) {
+            Shot.generateShots((player.x + 10),(player.x + (player.playerSizeX - 10)),player.y);
+		}
+    }
+   
+     /**
+     * restartGame
+     * This function restart the game
+     */
+     function restartGame(){
+        if(idGame == undefined){
+            document.getElementById("lives").innerHTML = `${LANGUAGE.GAME_MARKER.LIVES}  3`; 
+            document.getElementById("score").firstElementChild.innerHTML = 0;  
+            CANVAS.setAttribute("class","game0");
+            menu.setAudioStatus(true);
+            Shot.aShots = [];
+            idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
+        }
+            
+    }
     
     /**
      * outWallpaper
@@ -275,7 +313,7 @@ window.onload = function(){
         canvasOpacity--; 
 		
 		if(canvasOpacity > 0){
-			CANVAS.setAttribute("style", `opacity: ${canvasOpacity}%`/*opacidadCanvas*/);
+			CANVAS.setAttribute("style", `opacity: ${canvasOpacity}%`);
 		}else{
 
             // Clean the menu options
@@ -289,8 +327,6 @@ window.onload = function(){
             document.getElementById("gameMarker").setAttribute("style",
                 `background-image: linear-gradient(${gradients[numeroDeFondo - 1]});`);
 
-            // *** TODO [CHECKING] 
-            
             // Desactivate audio menu.
             menu.setAudioStatus(false);
 
@@ -299,13 +335,15 @@ window.onload = function(){
             player.draw(CTX);
             ball.draw(CTX);
             
-					
+            // Build the capsule
+            const brickWithCapsule = bricks.filter(item => item.isCapsuleInside)[0];
+            capsule = new Capsule(brickWithCapsule.x,brickWithCapsule.y);
+            		
 			// End the interval outWallpaper
 			clearInterval(idGame);
 
 			// Call the new interval inWallpaper game
-			idGame = setInterval(inWallpaperGame,50);
-            
+			idGame = setInterval(inWallpaperGame,GAME_LOOP_KEY_FRAME);
         }    
     }
 
@@ -321,7 +359,7 @@ window.onload = function(){
 		}else{
             // Clear interval initial animate && load gameLoop
 			clearInterval(idGame);
-			idGame = setInterval(gameLoop, 10); // Evaluate frameRate
+			idGame = setInterval(gameLoop, GAME_LOOP_KEY_FRAME); // Evaluate frameRate
 		}
     }
 
@@ -333,10 +371,11 @@ window.onload = function(){
 	**********************************************************************/
     
     // Global var
-
-    var LANGUAGE = undefined;
+    const PLAYER_SHOOTING_TIME = 5000;
+    const GAME_LOOP_KEY_FRAME = 10;
     const CANVAS = document.getElementById("myGameCanvas");
     const CTX = CANVAS.getContext("2d");
+    let LANGUAGE = undefined;
     let frameRate = 50;
     let canvasOpacity = 100;
     let gradients = ["",
@@ -352,6 +391,7 @@ window.onload = function(){
     let bricks = undefined;
     let player = undefined;
     let ball = undefined;
+    let capsule = undefined;
     
     initialize();    
 }

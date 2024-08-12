@@ -61,7 +61,8 @@ export class Brick{
         // Parameters of wall depending on game mode selected
         if(gameMode == lang.DIFICULT.DIFICULT_MODES[1].TITLE){
             // *** Medium mode
-            rowsBrickWall = 35; //5 rows [7 bricks for row] (5 * 7 = 35)
+            bricksRows = 5;
+            /*rowsBrickWall = 35; //5 rows [7 bricks for row] (5 * 7 = 35)
     
             //*** JR Mode [Only in medium mode].
             Brick.prototype.isJRmode = Brick.#isSpecialGameMode();
@@ -71,11 +72,12 @@ export class Brick{
                 // Set the brick wall map for JRMode and set scores.
                 arraySpecialMode = [0,0,1,0,1,1,1,0,0,1,0,1,0,1,0,0,1,0,1,1,1,1,0,1,0,1,1,0,1,1,1,0,1,0,1];
                 Brick.prototype.jrModeScore = 150;
-            }
+            }*/
 
         }else if(gameMode == lang.DIFICULT.DIFICULT_MODES[2].TITLE){
             // *** Hard mode
-            rowsBrickWall = 49; //7 rows with 7 bricks for row
+            bricksRows = 7;
+            /*rowsBrickWall = 49; //7 rows with 7 bricks for row
     
             // ***  Martian Mode.
             Brick.prototype.isMartianMode = Brick.#isSpecialGameMode();
@@ -85,7 +87,7 @@ export class Brick{
                 // Set the brick wall map for Martian Mode and set scores.
                 arraySpecialMode = [0,1,0,0,0,1,0,0,0,1,0,1,0,0,0,1,1,1,1,1,0,1,1,0,1,0,1,1,0,1,1,1,1,1,0,0,1,0,0,0,1,0,0,0,1,0,1,0,0];
                 Brick.prototype.martianModeScore = 260;
-            }
+            }*/
         }
 
         // Return a builded brickWall to draw in canvas
@@ -150,29 +152,25 @@ export class Brick{
      * @returns array with brick wall
      */
     static #generateBrickWall(RESIDUAL_SPACE,bricksOfRows,bricksRows,arraySpecialMode){ // rowsBrickWall
-        console.log(" bricksOfRows " + bricksOfRows + " bricksRows : " + bricksRows)
-        console.log("se construiran ->" + (bricksOfRows * bricksRows) + " ladrillos");
-        const BRICKS_WALL = bricksOfRows * bricksRows;
         // Internal vars
+        const BRICKS_WALL = bricksOfRows * bricksRows;
         let arrayBricks = [];
-        let positionX = RESIDUAL_SPACE / 2 //0;//15;              // Left margin of each row of bricks that will be drawed on the screen
-        const MARGIN_BETWEEN_BRICKS = 2; // Margin between each of the bricks, so that they are not drawed together or joined
-        const BRICK_SIZE_X = 64;         // X Brick size
+        let positionX = RESIDUAL_SPACE / 2; // Left margin of each row of bricks that will be drawed on the screen
+        const MARGIN_BETWEEN_BRICKS = 2;    // Margin between each of the bricks, so that they are not drawed together or joined
+        const BRICK_SIZE_X = 64;            // X Brick size
         
-        let positionY = 10;              // Top margin of the first row of bricks
-        const BRICK_SIZE_Y = 32;         // Y Brick size 
+        let positionY = 10;                 // Top margin of the first row of bricks
+        const BRICK_SIZE_Y = 32;            // Y Brick size 
 
-        let cont = 0;                    // Counter to control the brick of each row.
-        let index = 0;                   // Contains the value of the index of arrayPosicionesXsprite 
-                                         // (as many positions as rows exist depending on the difficulty, this array contains values ​​between 0-3)
-        //const BRICKS_ROW = 7;            // Number of bricks for each row
+        let cont = 0;                       // Counter to control the brick of each row.
+        let index = 0;                      // Contains the value of the index of arrayPosicionesXsprite 
+                                            // (as many positions as rows exist depending on the difficulty, this array contains values ​​between 0-3)
 
         // Set the random brick to contains the capsule to activate the shots.
-        const IS_BRICK_WITH_WEAPON_CAPSULE = Math.round(Math.random()*((BRICKS_WALL-1)-0) + 0); // rowsBrickWall
+        const IS_BRICK_WITH_WEAPON_CAPSULE = Math.round(Math.random()*((BRICKS_WALL-1)-0) + 0); 
             
-        
-        //Llamamos a la funcion encargada de definir las posiciones a recortar en cada fila, pasando el numero de filas que vamos a pintar
-        const ARRAY_X_POSITIONS_OF_SPRITE = Brick.#getSpritePosition(BRICKS_WALL); // rowsBrickWall
+        // Generate array with X positions
+        const ARRAY_X_POSITIONS_OF_SPRITE = Brick.#getSpritePosition(BRICKS_WALL); 
 
         // Building a brick wall
         for (let i = 0; i < BRICKS_WALL; i++){ //rowsBrickWall
@@ -181,30 +179,30 @@ export class Brick{
             arrayBricks.push(new Brick(positionX,positionY, Brick.prototype.animation[ARRAY_X_POSITIONS_OF_SPRITE[index]][0]));
     
             //Eval if the special game mode "JR mode" is activated and mark the brick as broken to draw the wall
-            if(Brick.prototype.isJRmode == 1 && arraySpecialMode[i] == 0){
+            /*if(Brick.prototype.isJRmode == 1 && arraySpecialMode[i] == 0){
                 arrayBricks[i].brokenBrick = true;
             }
     
             //Eval if the special game mode "Martian mode" is activated and mark the brick as broken to draw the wall
             if(Brick.prototype.isMartianMode == 1 && arraySpecialMode[i] == 0){
                 arrayBricks[i].brokenBrick = true;
-            }
+            }*/
     
             // Eval if this current for index is equal to brick with weapon capsule
             if (i == IS_BRICK_WITH_WEAPON_CAPSULE){
+                console.log("CAPUSLE IN BRICK NUMBER -> " + i);
                 arrayBricks[i].setCapsuleInside(true); // Mark the brick with the weapon capsule
             }
     
             //Recalculate the X position
-            console.log("index -> " + i + " positionX -> " + positionX);
             positionX = positionX + BRICK_SIZE_X + MARGIN_BETWEEN_BRICKS;
             
             // This conditional reset all values to start a new row brick 
-            if (cont == bricksOfRows/*BRICKS_ROW*/){                                                                 
-                positionX = RESIDUAL_SPACE / 2//0//15;                        // Reset the X position because is the start of each row of wall
-                positionY = positionY + BRICK_SIZE_Y + MARGIN_BETWEEN_BRICKS; // Update the Y position for new row of brick wall
-                cont = 0;                                                     // Reset row bricks counter. Controls of the brick of each row 
-                index ++;                                                     // 3, 5 or 7 rows. Depending of the game mode selected. 
+            if (cont == bricksOfRows){                                                                 
+                positionX = RESIDUAL_SPACE / 2;                                 // Reset the X position because is the start of each row of wall
+                positionY = positionY + BRICK_SIZE_Y + MARGIN_BETWEEN_BRICKS;   // Update the Y position for new row of brick wall
+                cont = 0;                                                       // Reset row bricks counter. Controls of the brick of each row 
+                index ++;                                                       // 3, 5 or 7 rows. Depending of the game mode selected. 
             }
         }
 

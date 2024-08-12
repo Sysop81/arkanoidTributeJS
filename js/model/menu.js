@@ -46,7 +46,7 @@ export class Menu{
         const WIDTH = (this.canvas.width / 2) - ((this.canvas.width / 2) / 4);
         const VALUE_TO_INCREASE = 30;
 
-        this.drawLogo((WIDTH - 300), 200);
+        this.drawLogo((height / 10));
 
         if(this.menuIndex > 0){
             this.ctx.fillText(this.menuIndex == 1 ? this.lang.DIFICULT.TITLE : this.lang.RANKING.TITLE,WIDTH, height);
@@ -65,16 +65,16 @@ export class Menu{
      * @param wPosition 
      * @param hPosition 
      */
-    drawLogo(wPosition,hPosition){
+    drawLogo(hPosition){
         this.ctx.drawImage(this.image,  // Image logo
             0,                          // Logo X position to draw 
             0,                          // Logo Y Position to draw 
             1750,		                // Size X of the image logo
             500,	                    // Size Y of the image logo
-            wPosition,                  // Display X position to draw the logo
+            0,                          // Display X position to draw the logo
             hPosition,	                // Display Y position to darw the logo
-            900,		                // Size X of the logo
-            300);                       // Size Y of the logo
+            this.canvas.width,		    // Size X of the logo
+            200);                       // Size Y of the logo
     }
 
     /**
