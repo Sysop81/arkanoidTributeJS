@@ -4,8 +4,8 @@
  */
 
 // Imports libraries
-import { loadLanguage, setCanvasMeasures} from "/js/util/tools.js";
-import { Menu } from "/js/model/menu.js";
+import { loadLanguage, setCanvasMeasures} from "./util/tools.js";
+import { Menu } from "./model/menu.js";
 import { Brick } from "./model/brick.js";
 import { Player } from "./model/player.js";
 import { Ball } from "./model/ball.js";
