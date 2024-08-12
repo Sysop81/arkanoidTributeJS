@@ -31,7 +31,7 @@ export class Brick{
      */
     static loadBrickAsset(){
         Brick.prototype.image = new Image();
-        Brick.prototype.image.src = "../../assets/img/sprites/bricks.png";
+        Brick.prototype.image.src = `${window.location.pathname.replace(/\/$/, "")}/assets/img/sprites/bricks.png`; //"../../assets/img/sprites/bricks.png";
         Brick.prototype.animation = [[0,0],[71,0],[143,0],[215,0]];
         Brick.prototype.isMartianMode = 0;
         Brick.prototype.isJRmode = 0;
