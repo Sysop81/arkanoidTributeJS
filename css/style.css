@@ -1,3 +1,6 @@
+*{
+	font-family: 'arcade',sans-serif;
+}
 #myGameCanvas {
 	width: 100%;
 	height: 90vh;
@@ -84,3 +87,25 @@
 .black{
 	background-color:black !important;
 }
+
+/* Animation */
+.rainbow{
+	background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+	animation: rainbow-animation 8s ease infinite;
+	background-size: 400%;
+}
+
+@keyframes rainbow-animation{
+	0%{
+		background-position: 0% 50%;
+		color: black;
+	}
+	50%{
+		background-position: 100% 50%;
+		color:white;
+	}
+	100%{
+		background-position: 0% 50%;
+		color: black;
+	}
+  }

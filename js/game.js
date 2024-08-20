@@ -4,7 +4,7 @@
  */
 
 // Imports libraries
-import { loadLanguage, setCanvasMeasures} from "./util/tools.js";
+import  * as Tools from "./util/tools.js";
 import { Menu } from "./model/menu.js";
 import { Brick } from "./model/brick.js";
 import { Player } from "./model/player.js";
@@ -20,15 +20,16 @@ window.onload = function(){
      * This function initializes the video game
      */
     function initialize(){
-        // Step 0. Set canvas sizes
-        setCanvasMeasures(CANVAS);
+        // Step 1. Set canvas sizes
+        Tools.setCanvasMeasures(CANVAS);
 
-        // Step 1. Load language from i18n
-        loadLanguage()
+        // Step 2. Load language from i18n
+        Tools.loadLanguage()
         .then(data => {
-            // Step 2. Load global vars, object and prototypes
+            // Step 3. Load global vars, object and prototypes
             LANGUAGE = data;
-            menu = new Menu(CANVAS,CTX,LANGUAGE);
+            scores = Tools.getLocalData(); 
+            menu = new Menu(CANVAS,CTX,LANGUAGE,scores);
             Menu.loadMenuAsset();
             Brick.loadBrickAsset();
             Player.loadPlayerAsset();
@@ -36,17 +37,99 @@ window.onload = function(){
             Explosion.loadExplosionAsset(CTX);
             Capsule.loadCapsuleAsset(CANVAS,CTX);
             Shot.loadShotAsset(CANVAS,CTX);
-
             
-            // Step 2. Show the game option menu
+            // Step 4. Show the game option menu
             idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
             
-            // Step 3. Handlers
+            // Step 5. Handlers
             document.addEventListener('keydown',manageKeyDown,false);
             document.addEventListener('keyup',manageKeyUp,false);
             document.addEventListener('keypress',manageKeyPress,true);
-            window.addEventListener('resize', setCanvasMeasures(CANVAS));
-            
+            window.addEventListener('resize', Tools.setCanvasMeasures(CANVAS));
+
+            // Step 0. Load player score modal
+            Tools.loadPlayerScoreModal()
+            .then(HTMLdata =>{
+                // Set Language in Score modal
+                document.getElementById('modalContainer').innerHTML = HTMLdata;
+                document.getElementById('mScoreTitle').textContent = LANGUAGE.MODAL.TITLE;
+                document.getElementById('mScoreClose').textContent = LANGUAGE.MODAL.BUTTON.CLOSE;
+                document.getElementById('mScoreSave').textContent = LANGUAGE.MODAL.BUTTON.SAVE;
+                document.getElementById('mScoreMsg').textContent = LANGUAGE.MODAL.MSG.TITLE;
+                document.getElementById('mHeaderSocre').textContent = LANGUAGE.MODAL.TABLE.SCORE
+                document.getElementById('mPlayerName').setAttribute("placeholder", LANGUAGE.MODAL.PLACEHOLDER);
+                document.getElementById('mSuccessMsg').innerHTML = LANGUAGE.MODAL.MSG.SUCCESS;   
+                document.getElementById('mErrorMsg').innerHTML = LANGUAGE.MODAL.MSG.ERROR.TITLE; 
+                document.getElementById('mScoreSave').disabled = true;
+                
+                // Add listerner to manage the input name player
+                document.getElementById('mPlayerName').addEventListener('keyup',(evt)=>{
+                    let value = document.getElementById('mPlayerName').value;
+                    let msg =  [];
+                    let isSaveBtnDisabled = true;
+                    
+                    // Check if empty input value
+                    if(Tools.validateEmpty(value)){
+                        msg.push(LANGUAGE.MODAL.MSG.ERROR.EMPTY)
+                    }
+
+                    // Check if key is not a character
+                    if(!Tools.validateCharacter(evt.key)){
+                        msg.push(LANGUAGE.MODAL.MSG.ERROR.RULE);
+                    }
+                    
+                    // check input length
+                    if(!Tools.validateLength(value)){
+                        msg.push(LANGUAGE.MODAL.MSG.ERROR.LENGTH);
+                    }
+
+                    // If no Errors -> go to save & set display none alert
+                    if(msg.length === 0){
+                        isSaveBtnDisabled = false;
+                        document.getElementsByClassName('alert-danger')[0].classList.add('d-none');
+                    }else{
+                        // Manage and show errors
+                        let eList = document.getElementById('mErrorList');
+                        eList.innerHTML = '';
+                        msg.forEach((item)=>{
+                            eList.innerHTML += `<li> ${item} </li>`; 
+                        });
+                        
+                        document.getElementsByClassName('alert-danger')[0].classList.remove('d-none');
+                    }
+
+                    // Manage save btn
+                    document.getElementById('mScoreSave').disabled = isSaveBtnDisabled;
+
+                },false);
+                
+                // Add listener to manage the new record save
+                document.getElementById('mScoreSave').addEventListener("click",()=>{
+                    // Update the Score array
+                    scores.push({name : document.getElementById('mPlayerName').value, 
+                                score : player.score
+                            });
+                    
+                    // Check if need remove any score element
+                    if(scores.length > 5)   scores.splice(socreIndex,1);
+                            
+                    // Update the localStorage rankings        
+                    if(Tools.setLocalData('scores',JSON.stringify(scores))){
+                        document.getElementById('mScoreSave').disabled = true;
+                        document.getElementsByClassName('alert-success')[0].classList.remove('d-none');
+                    }
+                });
+
+                // Manage a bootstrap modal object
+                try{
+                    MODAL_SCORE = new bootstrap.Modal(document.getElementById('mScore'));
+                }catch(e){
+                    console.error("Error to get Bootstrap [CDN-Error]");
+                }
+            })
+            .catch(error => {
+                console.error('Error loading score modal:', error);
+            }); 
         })
         .catch(error => {
             console.error('Error loading language:', error);
@@ -122,6 +205,21 @@ window.onload = function(){
         if(player.lives > 0 && player.score == bricks.length * 10){ // [NOT VALID TO SPECIALS MODES]
             msg = LANGUAGE.PLAYER_MSG.WIN;
             isStop = true;
+            let isShowModal = false;    
+            for(let i = 0; i < scores.length; i++){
+                if(scores[0].score < player.score){
+                    isShowModal = true;
+                    socreIndex = i;
+                    break;
+                }
+            }
+              
+            if(isShowModal || scores.length === 0){
+                // Update modal score
+                document.getElementById('mRecord').innerHTML = player.score;
+                // Show Score Modal
+                MODAL_SCORE.show();
+            } 
         }
 
         if(isStop){
@@ -295,6 +393,10 @@ window.onload = function(){
      */
      function restartGame(){
         if(idGame == undefined){
+            document.querySelectorAll('.alert-success, .alert-danger').forEach((node)=>{
+                node.classList.add('d-none');
+            });
+            document.getElementById('mPlayerName').value = '';
             document.getElementById("lives").innerHTML = `${LANGUAGE.GAME_MARKER.LIVES}  3`; 
             document.getElementById("score").firstElementChild.innerHTML = 0;  
             CANVAS.setAttribute("class","game0");
@@ -302,7 +404,6 @@ window.onload = function(){
             Shot.aShots = [];
             idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
         }
-            
     }
     
     /**
@@ -363,8 +464,6 @@ window.onload = function(){
 		}
     }
 
-    
-
 
     /*********************************************************************                                                                                                                                          *
 	*         PROGRAM FLOW                                               *                                                                                                                                         *
@@ -375,6 +474,7 @@ window.onload = function(){
     const GAME_LOOP_KEY_FRAME = 10;
     const CANVAS = document.getElementById("myGameCanvas");
     const CTX = CANVAS.getContext("2d");
+    let MODAL_SCORE = undefined;
     let LANGUAGE = undefined;
     let frameRate = 50;
     let canvasOpacity = 100;
@@ -392,6 +492,8 @@ window.onload = function(){
     let player = undefined;
     let ball = undefined;
     let capsule = undefined;
-    
+    let scores = undefined;
+    let socreIndex = 0;
+
     initialize();    
 }

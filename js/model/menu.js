@@ -1,9 +1,11 @@
+import { buildSavePlayerName } from "../util/tools.js";
+
 /**
  * Class Menu
  * Represents the game menu options
  */
 export class Menu{
-    constructor(canvas,ctx,lang){
+    constructor(canvas,ctx,lang,scores){
         this.canvas = canvas;
         this.ctx = ctx;
         this.lang = lang;
@@ -12,6 +14,7 @@ export class Menu{
         this.menuIndex = 0;
         this.menuItemIndex = 0;
         this.isAudioActive = true;
+        this.scores = scores == null ? [] : scores;
     }
 
     /**
@@ -102,13 +105,16 @@ export class Menu{
                 menuOptions = this.lang.DIFICULT.DIFICULT_MODES;
                 break;
             case 2: 
-                console.info("Selected Game Ranking");
                 menuOptions = [];
+                for(let i = 0; i < this.scores.length; i++){
+                    menuOptions.push({TITLE :`${buildSavePlayerName(this.scores[i].name)}        ${this.scores[i].score} pts`});
+                }
                 break;            
         }
 
         return menuOptions;
     }
+
 
     /**
      * manageOpMenu

@@ -17,7 +17,7 @@
         ]
     },
     "RANKING":{
-        "TITLE" : "BEST PLAYERS SCORES"
+        "TITLE" : "BEST  SCORES"
     },
     "PLAYER_MSG":{
         "RESET_GAME": "PRESS  'R' KEY   TO  RESTART",
@@ -25,5 +25,26 @@
         "WIN" : " !! YOU   WIN   !!",
         "GAME_OVER" : [" GAME ", " OVER "],
         "WEAPONS" : "PRESS  Z   TO  SHOOT"
+    },
+    "MODAL":{
+        "TITLE": "SET YOUR RECORD",
+        "MSG": {
+            "TITLE" : "DO YOU WANT TO SAVE YOUR RECORD IN THE RANKING TABLE?",
+            "SUCCESS" :"THE RECORD HAS BEEN SAVED CORRECTLY",
+            "ERROR" : {
+                "TITLE" : "ERROR INFORMATION",
+                "EMPTY": "THE PLAYER NANE CANNOT BE EMPTY",
+                "LENGTH" : "MAXIMUM 6 CHARACTERS",
+                "RULE": "ONLY NUMBERS AND LETTERS"
+            }
+        },
+        "TABLE":{
+            "SCORE":"SCORE"
+        },
+        "PLACEHOLDER": "SET YOUR NAME HERE...",
+        "BUTTON":{
+            "SAVE": "SAVE",
+            "CLOSE": "CLOSE"
+        }
     }
 }
