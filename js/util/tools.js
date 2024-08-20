@@ -69,9 +69,12 @@ export function setLocalData(key,value) {
  * @returns 
  */
 export function getLocalData(){
-    const SCORES = localStorage.getItem('scores');
-    if(SCORES === null) setLocalData('scores',JSON.stringify([])); 
-    return JSON.parse(SCORES);
+    let SCORES = JSON.parse(localStorage.getItem('scores'));
+    if(SCORES === null) {
+        SCORES = [];
+        setLocalData('scores',JSON.stringify(SCORES));
+    } 
+    return SCORES;
 }
 
 /**

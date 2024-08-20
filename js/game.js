@@ -118,6 +118,10 @@ window.onload = function(){
                         document.getElementById('mScoreSave').disabled = true;
                         document.getElementsByClassName('alert-success')[0].classList.remove('d-none');
                     }
+
+                    // Disabled input player name
+                    document.getElementById('mPlayerName').disabled = true;
+                    isShowingModal = false;
                 });
 
                 // Manage a bootstrap modal object
@@ -219,6 +223,8 @@ window.onload = function(){
                 document.getElementById('mRecord').innerHTML = player.score;
                 // Show Score Modal
                 MODAL_SCORE.show();
+                // Set modal ON    
+                isShowingModal = true;
             } 
         }
 
@@ -290,6 +296,7 @@ window.onload = function(){
      * @param evt
      */
     function manageKeyDown(evt){
+        if(isShowingModal) return;
         switch (evt.keyCode) {
 			case 13:
                 // ENTER
@@ -317,8 +324,7 @@ window.onload = function(){
                     menu.menuItemIndex = LANGUAGE.DIFICULT.DIFICULT_MODES.findIndex(item => item.TITLE == menu.dificultSelected);
                     menu.menuSelected = menu.dificultSelected;
                 }else if(menu.menuSelected == LANGUAGE.OPTION_MENU[2].TITLE){
-                    // *** RANKING
-                    console.log("show rankings. [DISABLED OPTION]");    
+                    // *** RANKING    
                     menu.menuIndex = 2;
                 }
                 break;
@@ -397,6 +403,7 @@ window.onload = function(){
                 node.classList.add('d-none');
             });
             document.getElementById('mPlayerName').value = '';
+            document.getElementById('mPlayerName').disabled = false;
             document.getElementById("lives").innerHTML = `${LANGUAGE.GAME_MARKER.LIVES}  3`; 
             document.getElementById("score").firstElementChild.innerHTML = 0;  
             CANVAS.setAttribute("class","game0");
@@ -494,6 +501,7 @@ window.onload = function(){
     let capsule = undefined;
     let scores = undefined;
     let socreIndex = 0;
+    let isShowingModal = false;
 
     initialize();    
 }
