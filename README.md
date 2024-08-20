@@ -20,4 +20,6 @@ El juego se encuentra desplegado en __github-pages__ al cual se puede acceder ha
 | ->   | Mueve el jugador a la derecha |
 | Z    | Disparar |
 | R    | Resetear la partida [sólo cuando esta termina]|
-| space| Pone la bola en juego |
+| SPACE| Pone la bola en juego |
+| ENTER| Selecciona menus, modos de juego y comienzo de partida |
+| ESC | Salir de menus o volver hacia atrás |
