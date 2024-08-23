@@ -47,7 +47,11 @@ window.onload = function(){
             document.addEventListener('keypress',manageKeyPress,true);
             window.addEventListener('resize', Tools.setCanvasMeasures(CANVAS));
 
-            // Step 0. Load player score modal
+            // Game pad handlers
+            document.addEventListener('touchstart',manageTouchStart,false);
+            document.addEventListener('touchend',manageTouchEnd,false);
+            
+            // Step 7. Load player score modal
             Tools.loadPlayerScoreModal()
             .then(HTMLdata =>{
                 // Set Language in Score modal
@@ -74,7 +78,8 @@ window.onload = function(){
                     }
 
                     // Check if key is not a character
-                    if(!Tools.validateCharacter(evt.key)){
+                    const LAST_VALUE = value.length > 0 ? value.charAt(value.length - 1) : '';
+                    if(LAST_VALUE != '' && !Tools.validateCharacter(LAST_VALUE)){
                         msg.push(LANGUAGE.MODAL.MSG.ERROR.RULE);
                     }
                     
@@ -127,6 +132,12 @@ window.onload = function(){
                 // Manage a bootstrap modal object
                 try{
                     MODAL_SCORE = new bootstrap.Modal(document.getElementById('mScore'));
+
+                    // Adding handler to close modal
+                    document.getElementById('mScore').addEventListener('hide.bs.modal',()=>{
+                        isShowingModal = false;
+                    });
+
                 }catch(e){
                     console.error("Error to get Bootstrap [CDN-Error]");
                 }
@@ -289,6 +300,62 @@ window.onload = function(){
                 break;           
         }
     }
+
+    /**
+     * manageTouchStart [TODO REFACT]
+     * @param {*} evt 
+     */
+    function manageTouchStart(evt){
+        //console.log(evt.target.id);
+        switch(evt.target.id){
+            case 'pUp':
+                manageKeyDown({keyCode:38});
+                break;
+            case 'pLeft':
+                Player.prototype.xLeft = true;
+                break;
+            case 'pRight':
+                Player.prototype.xRight = true;
+                break;
+            case 'pDown':
+                manageKeyDown({keyCode:40});
+                break;
+            case 'pEsc':
+                manageKeyDown({keyCode:27});
+                break;
+            case 'pSpc':
+                manageKeyDown({keyCode:32});
+                break;
+            case 'pEnt':
+                manageKeyDown({keyCode:13});
+                break;
+            case 'pZ':
+                manageKeyPress({charCode:90});
+                break;
+            case 'pR':
+                manageKeyDown({keyCode:82});
+                break;
+
+        }
+    }
+
+    /**
+     * manageTouchEnd [ TODO ]
+     * @param {*} evt 
+     */
+    function manageTouchEnd(evt){
+        switch (evt.target.id) {
+			case 'pLeft': 
+                // Left arrow
+                Player.prototype.xLeft = false;
+			    break;
+			case 'pRight':
+                // Right arrow   
+                Player.prototype.xRight = false;
+			    break;
+        }
+    }
+
     
     /**
      * manageKeyDown [Handler]
@@ -399,6 +466,12 @@ window.onload = function(){
      */
      function restartGame(){
         if(idGame == undefined){
+            
+            // Enable menu buttons
+            document.querySelectorAll('.menu').forEach((element)=>{
+                element.classList.remove('d-none');
+            });
+
             document.querySelectorAll('.alert-success, .alert-danger').forEach((node)=>{
                 node.classList.add('d-none');
             });
@@ -423,6 +496,11 @@ window.onload = function(){
 		if(canvasOpacity > 0){
 			CANVAS.setAttribute("style", `opacity: ${canvasOpacity}%`);
 		}else{
+
+            // Disable menu buttons
+            document.querySelectorAll('.menu').forEach((element)=>{
+                element.classList.add('d-none');
+            });
 
             // Clean the menu options
             CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);

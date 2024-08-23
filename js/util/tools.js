@@ -97,7 +97,8 @@ export function buildSavePlayerName(targetName){
  * @returns true or false
  */
 export function validateCharacter(character){
-    if(character.toLowerCase() == 'backspace') return true;
+    console.log(character)
+    //if(character.toLowerCase() == 'backspace') return true;
     const regex = /^[a-zA-Z0-9]$/;
     return regex.test(character);
 }

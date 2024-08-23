@@ -1,9 +1,10 @@
 *{
 	font-family: 'arcade',sans-serif;
 }
+
 #myGameCanvas {
 	width: 100%;
-	height: 90vh;
+	height: 70vh;
 	border: solid 1px #ccc;
 	background-size: cover;
 	border-radius: 0 0 5px 5px;
