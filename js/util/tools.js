@@ -7,9 +7,10 @@ const BASE_PATH = window.location.pathname.replace(/\/$/, "");
  * This function returns the player score modal HTML to load in main INDEX
  * @returns HTML
  */
-export async function loadPlayerScoreModal(){
-    const MODAL_FILE = `${BASE_PATH}/modal/modal.html`;
-    const response = await fetch(MODAL_FILE);      
+export async function loadComponents(folder,file){
+    const FILE_PATH = `${BASE_PATH}/${folder}/${file}`;
+    //const MODAL_FILE = `${BASE_PATH}/modal/modal.html`;
+    const response = await fetch(FILE_PATH);      
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -121,4 +122,29 @@ export function validateLength(text){
  */
 export function validateEmpty(text){
     return text.length === 0;
+}
+
+/**
+ * showGamePad
+ * This function determines if it is a touch device or not
+ * @returns true or false
+ */
+export function showGamePad(){
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+
+/**
+ * changeLeftGamePad
+ * This function shows or hide the left pad buttons based on is playing or not
+ * @param {*} isPlayingGame 
+ */
+export function changeLeftGamePad(isPlayingGame){
+    const TARGET_CLASS = isPlayingGame ? 'game' : 'menu';
+    document.querySelectorAll('.game, .menu').forEach((element)=>{
+        if(element.classList.contains(TARGET_CLASS)){
+            element.classList.remove('d-none');
+        }else{
+            element.classList.add('d-none');
+        }
+    });
 }

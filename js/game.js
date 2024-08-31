@@ -12,6 +12,7 @@ import { Ball } from "./model/ball.js";
 import { Explosion } from "./model/explosion.js";
 import { Capsule } from "./model/capsule.js";
 import { Shot } from "./model/shot.js";
+import { ModalScore } from "./components/modal.js";
 
 window.onload = function(){
     
@@ -27,9 +28,8 @@ window.onload = function(){
         Tools.loadLanguage()
         .then(data => {
             // Step 3. Load global vars, object and prototypes
-            LANGUAGE = data;
-            scores = Tools.getLocalData(); 
-            menu = new Menu(CANVAS,CTX,LANGUAGE,scores);
+            LANGUAGE = data; 
+            menu = new Menu(CANVAS,CTX,LANGUAGE);
             Menu.loadMenuAsset();
             Brick.loadBrickAsset();
             Player.loadPlayerAsset();
@@ -37,6 +37,7 @@ window.onload = function(){
             Explosion.loadExplosionAsset(CTX);
             Capsule.loadCapsuleAsset(CANVAS,CTX);
             Shot.loadShotAsset(CANVAS,CTX);
+            ModalScore.loadModalScoresAsset(LANGUAGE,Tools);
             
             // Step 4. Show the game option menu
             idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
@@ -47,100 +48,33 @@ window.onload = function(){
             document.addEventListener('keypress',manageKeyPress,true);
             window.addEventListener('resize', Tools.setCanvasMeasures(CANVAS));
 
-            // Game pad handlers
-            document.addEventListener('touchstart',manageTouchStart,false);
-            document.addEventListener('touchend',manageTouchEnd,false);
+            // Load GamePad && handlers
+            if(Tools.showGamePad()){
+                Tools.loadComponents("peripherals","gamepad.html")
+                .then(HTMLdata =>{
+                    // Set HTML pad in the container
+                    document.getElementById("gamePadContainer").innerHTML = HTMLdata;
+                    // Adding handlers
+                    document.querySelectorAll('.btn').forEach(btn=>{
+                        btn.addEventListener('touchstart',manageTouchStart,false);
+                        btn.addEventListener('touchend',manageTouchEnd,false);
+                    })
+                    
+                    // Disable menu buttons
+                    document.querySelectorAll('.game').forEach((element)=>{
+                        element.classList.add('d-none');
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading gamePad:', error);
+                });   
+            }
             
             // Step 7. Load player score modal
-            Tools.loadPlayerScoreModal()
+            Tools.loadComponents("modal","modal.html")
             .then(HTMLdata =>{
-                // Set Language in Score modal
-                document.getElementById('modalContainer').innerHTML = HTMLdata;
-                document.getElementById('mScoreTitle').textContent = LANGUAGE.MODAL.TITLE;
-                document.getElementById('mScoreClose').textContent = LANGUAGE.MODAL.BUTTON.CLOSE;
-                document.getElementById('mScoreSave').textContent = LANGUAGE.MODAL.BUTTON.SAVE;
-                document.getElementById('mScoreMsg').textContent = LANGUAGE.MODAL.MSG.TITLE;
-                document.getElementById('mHeaderSocre').textContent = LANGUAGE.MODAL.TABLE.SCORE
-                document.getElementById('mPlayerName').setAttribute("placeholder", LANGUAGE.MODAL.PLACEHOLDER);
-                document.getElementById('mSuccessMsg').innerHTML = LANGUAGE.MODAL.MSG.SUCCESS;   
-                document.getElementById('mErrorMsg').innerHTML = LANGUAGE.MODAL.MSG.ERROR.TITLE; 
-                document.getElementById('mScoreSave').disabled = true;
-                
-                // Add listerner to manage the input name player
-                document.getElementById('mPlayerName').addEventListener('keyup',(evt)=>{
-                    let value = document.getElementById('mPlayerName').value;
-                    let msg =  [];
-                    let isSaveBtnDisabled = true;
-                    
-                    // Check if empty input value
-                    if(Tools.validateEmpty(value)){
-                        msg.push(LANGUAGE.MODAL.MSG.ERROR.EMPTY)
-                    }
-
-                    // Check if key is not a character
-                    const LAST_VALUE = value.length > 0 ? value.charAt(value.length - 1) : '';
-                    if(LAST_VALUE != '' && !Tools.validateCharacter(LAST_VALUE)){
-                        msg.push(LANGUAGE.MODAL.MSG.ERROR.RULE);
-                    }
-                    
-                    // check input length
-                    if(!Tools.validateLength(value)){
-                        msg.push(LANGUAGE.MODAL.MSG.ERROR.LENGTH);
-                    }
-
-                    // If no Errors -> go to save & set display none alert
-                    if(msg.length === 0){
-                        isSaveBtnDisabled = false;
-                        document.getElementsByClassName('alert-danger')[0].classList.add('d-none');
-                    }else{
-                        // Manage and show errors
-                        let eList = document.getElementById('mErrorList');
-                        eList.innerHTML = '';
-                        msg.forEach((item)=>{
-                            eList.innerHTML += `<li> ${item} </li>`; 
-                        });
-                        
-                        document.getElementsByClassName('alert-danger')[0].classList.remove('d-none');
-                    }
-
-                    // Manage save btn
-                    document.getElementById('mScoreSave').disabled = isSaveBtnDisabled;
-
-                },false);
-                
-                // Add listener to manage the new record save
-                document.getElementById('mScoreSave').addEventListener("click",()=>{
-                    // Update the Score array
-                    scores.push({name : document.getElementById('mPlayerName').value, 
-                                score : player.score
-                            });
-                    
-                    // Check if need remove any score element
-                    if(scores.length > 5)   scores.splice(socreIndex,1);
-                            
-                    // Update the localStorage rankings        
-                    if(Tools.setLocalData('scores',JSON.stringify(scores))){
-                        document.getElementById('mScoreSave').disabled = true;
-                        document.getElementsByClassName('alert-success')[0].classList.remove('d-none');
-                    }
-
-                    // Disabled input player name
-                    document.getElementById('mPlayerName').disabled = true;
-                    isShowingModal = false;
-                });
-
-                // Manage a bootstrap modal object
-                try{
-                    MODAL_SCORE = new bootstrap.Modal(document.getElementById('mScore'));
-
-                    // Adding handler to close modal
-                    document.getElementById('mScore').addEventListener('hide.bs.modal',()=>{
-                        isShowingModal = false;
-                    });
-
-                }catch(e){
-                    console.error("Error to get Bootstrap [CDN-Error]");
-                }
+                // Build Score modal object
+                modalScore = new ModalScore(HTMLdata);
             })
             .catch(error => {
                 console.error('Error loading score modal:', error);
@@ -217,25 +151,24 @@ window.onload = function(){
         let isStop = false;
         let msg = LANGUAGE.PLAYER_MSG.GAME_OVER;
         if(player.lives == 0) isStop = true;
-        if(player.lives > 0 && player.score == bricks.length * 10){ // [NOT VALID TO SPECIALS MODES]
+        if(player.lives > 0 && player.score == bricks.length * 10){
             msg = LANGUAGE.PLAYER_MSG.WIN;
             isStop = true;
-            let isShowModal = false;    
+            let isShowModal = false;
+            const scores = Tools.getLocalData();    
             for(let i = 0; i < scores.length; i++){
                 if(scores[0].score < player.score){
                     isShowModal = true;
-                    socreIndex = i;
+                    modalScore.scoreIndex = i;
                     break;
                 }
             }
               
             if(isShowModal || scores.length === 0){
                 // Update modal score
-                document.getElementById('mRecord').innerHTML = player.score;
-                // Show Score Modal
-                MODAL_SCORE.show();
-                // Set modal ON    
-                isShowingModal = true;
+                modalScore.setScore(player.score);
+                // Show modal score
+                modalScore.show();
             } 
         }
 
@@ -302,45 +235,40 @@ window.onload = function(){
     }
 
     /**
-     * manageTouchStart [TODO REFACT]
+     * manageTouchStart [Handler]
+     * Manage a display touch or button click
      * @param {*} evt 
      */
     function manageTouchStart(evt){
-        //console.log(evt.target.id);
+
+        const KEY_ACTIONS = {
+            pUp : {keyCode:38},
+            pDown:{keyCode:40},
+            pEsc :{keyCode:27},
+            pSpc :{keyCode:32},
+            pEnt :{keyCode:13},
+            pZ : {charCode:90},
+            pR : {keyCode:82}
+        };
+
         switch(evt.target.id){
-            case 'pUp':
-                manageKeyDown({keyCode:38});
-                break;
             case 'pLeft':
                 Player.prototype.xLeft = true;
                 break;
             case 'pRight':
                 Player.prototype.xRight = true;
                 break;
-            case 'pDown':
-                manageKeyDown({keyCode:40});
-                break;
-            case 'pEsc':
-                manageKeyDown({keyCode:27});
-                break;
-            case 'pSpc':
-                manageKeyDown({keyCode:32});
-                break;
-            case 'pEnt':
-                manageKeyDown({keyCode:13});
-                break;
             case 'pZ':
-                manageKeyPress({charCode:90});
+                manageKeyPress(KEY_ACTIONS.pZ);
                 break;
-            case 'pR':
-                manageKeyDown({keyCode:82});
-                break;
-
+            default:
+                manageKeyDown(KEY_ACTIONS[evt.target.id]);        
         }
     }
 
     /**
-     * manageTouchEnd [ TODO ]
+     * manageTouchEnd [Handler]
+     * Manage a display touch or button click
      * @param {*} evt 
      */
     function manageTouchEnd(evt){
@@ -363,12 +291,14 @@ window.onload = function(){
      * @param evt
      */
     function manageKeyDown(evt){
-        if(isShowingModal) return;
+        if(modalScore.isShowingModal) return;
         switch (evt.keyCode) {
 			case 13:
                 // ENTER
+                if(isGameRunning) return;
                 if(menu.menuSelected == LANGUAGE.OPTION_MENU[0].TITLE){
                     // *** NEW GAME
+                    isGameRunning = true;
                     // Play the audio for start a new game.
                     menu.playAudioStartGame();
                     console.log("Start a new game with dificulty -> " + menu.dificultSelected);
@@ -411,6 +341,7 @@ window.onload = function(){
                 break;    
 			case 38:
                 // Up arrow
+                if(menu.menuIndex == 2) return;
                 menu.playAudioOpMenu();
                 menu.manageOpMenu(false)
                 break;
@@ -420,6 +351,7 @@ window.onload = function(){
                 break;    
             case 40:
                 // Down arrow
+                if(menu.menuIndex == 2) return;
                 menu.playAudioOpMenu();
                 menu.manageOpMenu(true)
                 break;
@@ -465,25 +397,19 @@ window.onload = function(){
      * This function restart the game
      */
      function restartGame(){
-        if(idGame == undefined){
-            
-            // Enable menu buttons
-            document.querySelectorAll('.menu').forEach((element)=>{
-                element.classList.remove('d-none');
-            });
+        if(idGame != undefined) return;
+        isGameRunning = false;
+        // Enable menu buttons
+        Tools.changeLeftGamePad(isGameRunning);
 
-            document.querySelectorAll('.alert-success, .alert-danger').forEach((node)=>{
-                node.classList.add('d-none');
-            });
-            document.getElementById('mPlayerName').value = '';
-            document.getElementById('mPlayerName').disabled = false;
-            document.getElementById("lives").innerHTML = `${LANGUAGE.GAME_MARKER.LIVES}  3`; 
-            document.getElementById("score").firstElementChild.innerHTML = 0;  
-            CANVAS.setAttribute("class","game0");
-            menu.setAudioStatus(true);
-            Shot.aShots = [];
-            idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
-        }
+        document.getElementById('mPlayerName').value = '';
+        document.getElementById('mPlayerName').disabled = false;
+        document.getElementById("lives").innerHTML = `${LANGUAGE.GAME_MARKER.LIVES}  3`; 
+        document.getElementById("score").firstElementChild.innerHTML = 0;  
+        CANVAS.setAttribute("class","game0");
+        menu.setAudioStatus(true);
+        Shot.aShots = [];
+        idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
     }
     
     /**
@@ -497,11 +423,9 @@ window.onload = function(){
 			CANVAS.setAttribute("style", `opacity: ${canvasOpacity}%`);
 		}else{
 
-            // Disable menu buttons
-            document.querySelectorAll('.menu').forEach((element)=>{
-                element.classList.add('d-none');
-            });
-
+            // Change left gamePad arrows
+            Tools.changeLeftGamePad(isGameRunning);
+            
             // Clean the menu options
             CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
 
@@ -545,7 +469,7 @@ window.onload = function(){
 		}else{
             // Clear interval initial animate && load gameLoop
 			clearInterval(idGame);
-			idGame = setInterval(gameLoop, GAME_LOOP_KEY_FRAME); // Evaluate frameRate
+			idGame = setInterval(gameLoop, GAME_LOOP_KEY_FRAME);
 		}
     }
 
@@ -559,7 +483,6 @@ window.onload = function(){
     const GAME_LOOP_KEY_FRAME = 10;
     const CANVAS = document.getElementById("myGameCanvas");
     const CTX = CANVAS.getContext("2d");
-    let MODAL_SCORE = undefined;
     let LANGUAGE = undefined;
     let frameRate = 50;
     let canvasOpacity = 100;
@@ -577,9 +500,8 @@ window.onload = function(){
     let player = undefined;
     let ball = undefined;
     let capsule = undefined;
-    let scores = undefined;
-    let socreIndex = 0;
-    let isShowingModal = false;
+    let isGameRunning = false; 
+    let modalScore = undefined;
 
     initialize();    
 }

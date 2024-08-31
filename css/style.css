@@ -35,6 +35,13 @@
 	float: right;
 }
 
+.gamepad-padding{
+	padding-right: .7rem;
+	padding-left: .7rem;
+	position: relative;
+	top: -.5%;
+}
+
 /* Wallpapers */
 .game0{
  background: url("../assets/img/wallpapers/w_black.png");

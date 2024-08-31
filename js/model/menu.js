@@ -1,11 +1,11 @@
-import { buildSavePlayerName } from "../util/tools.js";
+import { buildSavePlayerName, getLocalData } from "../util/tools.js";
 
 /**
  * Class Menu
  * Represents the game menu options
  */
 export class Menu{
-    constructor(canvas,ctx,lang,scores){
+    constructor(canvas,ctx,lang){
         this.canvas = canvas;
         this.ctx = ctx;
         this.lang = lang;
@@ -14,7 +14,7 @@ export class Menu{
         this.menuIndex = 0;
         this.menuItemIndex = 0;
         this.isAudioActive = true;
-        this.scores = scores == null ? [] : scores;
+        //this.scores = getLocalData(); /*scores == null ? [] : scores;*/
     }
 
     /**
@@ -106,8 +106,9 @@ export class Menu{
                 break;
             case 2: 
                 menuOptions = [];
-                for(let i = 0; i < this.scores.length; i++){
-                    menuOptions.push({TITLE :`${buildSavePlayerName(this.scores[i].name)}        ${this.scores[i].score} pts`});
+                const scores = getLocalData();
+                for(let i = 0; i < scores.length; i++){
+                    menuOptions.push({TITLE :`${buildSavePlayerName(scores[i].name)}        ${scores[i].score} pts`});
                 }
                 break;            
         }
