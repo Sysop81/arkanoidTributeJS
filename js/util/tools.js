@@ -9,7 +9,6 @@ const BASE_PATH = window.location.pathname.replace(/\/$/, "");
  */
 export async function loadComponents(folder,file){
     const FILE_PATH = `${BASE_PATH}/${folder}/${file}`;
-    //const MODAL_FILE = `${BASE_PATH}/modal/modal.html`;
     const response = await fetch(FILE_PATH);      
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -54,7 +53,7 @@ export function setCanvasMeasures(canvas){
  */        
 export function setLocalData(key,value) {
     try{
-        localStorage.setItem(key, value);
+        localStorage.setItem(key,value);
         return true;
     }catch(e){
         console.error("Can not save the record");
@@ -67,7 +66,7 @@ export function setLocalData(key,value) {
  * getLocalData
  * This function gets the array of scores saved in localStorage
  * @param {} key 
- * @returns 
+ * @returns [] scores
  */
 export function getLocalData(){
     let SCORES = JSON.parse(localStorage.getItem('scores'));
@@ -75,7 +74,7 @@ export function getLocalData(){
         SCORES = [];
         setLocalData('scores',JSON.stringify(SCORES));
     } 
-    return SCORES;
+    return SCORES.sort((first,second)=> first.score - second.score)
 }
 
 /**
@@ -98,8 +97,6 @@ export function buildSavePlayerName(targetName){
  * @returns true or false
  */
 export function validateCharacter(character){
-    console.log(character)
-    //if(character.toLowerCase() == 'backspace') return true;
     const regex = /^[a-zA-Z0-9]$/;
     return regex.test(character);
 }
