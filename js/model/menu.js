@@ -14,6 +14,7 @@ export class Menu{
         this.menuIndex = 0;
         this.menuItemIndex = 0;
         this.isAudioActive = true;
+        this.isShowingGameTypeMenu = false;
     }
 
     /**
@@ -55,7 +56,7 @@ export class Menu{
         }
         
         this.menuSelected = this.#getMenuItems()[this.menuItemIndex].TITLE
-        
+
         if(this.menuIndex == 1){
             this.dificultSelected = this.menuSelected
             console.log("game modes. Selected : " + this.menuSelected)
@@ -143,6 +144,10 @@ export class Menu{
     #getMenuItems(){
         let menuOptions = undefined;
         switch(this.menuIndex){
+            case -1:
+                // Game type [Testing]
+                menuOptions = this.lang.NEW_GAME_TYPE;
+                break;
             case 0:
                 menuOptions = this.lang.OPTION_MENU;
                 break;

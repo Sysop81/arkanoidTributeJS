@@ -8,6 +8,11 @@
         {"TITLE": "DIFICULT"},
         {"TITLE": "RANKING"}
     ],
+    "NEW_GAME_TYPE":[
+        {"TITLE": "QUICK GAME"},
+        {"TITLE": "INFINITE GAME"},
+        {"TITLE": "CAMPAIGN GAME"}
+    ],
     "DIFICULT": {
         "TITLE": "SELECT A DIFICULT MODE",
         "DIFICULT_MODES":[
@@ -24,7 +29,8 @@
         "START_GAME": "PRESS    SPACE   TO  START",
         "WIN" : " !! YOU   WIN   !!",
         "GAME_OVER" : [" GAME ", " OVER "],
-        "WEAPONS" : "PRESS  Z   TO  SHOOT"
+        "WEAPONS" : "PRESS  Z   TO  SHOOT",
+        "WORLD_NUMBER" : "WORLD"
     },
     "MODAL":{
         "TITLE": "SET YOUR RECORD",

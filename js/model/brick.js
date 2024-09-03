@@ -53,7 +53,7 @@ export class Brick{
         //let rowsBrickWall = 21;                 // Rows with bricks to build a wall bricks of the game. DEFAULT EASY MODE with 3 rows [7 bricks for row] (3 * 7 = 21)
         let bricksForRow = Math.floor(canvas.width  / 66.0);
         const RESIDUAL_SPACE = canvas.width - (bricksForRow * 66.0); // TODO COMPLETE THIS METHOD IN MEDIUM AND HARD MODES
-        console.log("RESIDUO: -> " + RESIDUAL_SPACE)
+        //console.log("RESIDUO: -> " + RESIDUAL_SPACE)
         let bricksRows = 3;
         Brick.prototype.jrModeScore = 0;        // Reset JR Mode score
         Brick.prototype.martianModeScore = 0;   // Reset Martian Mode score
@@ -190,7 +190,7 @@ export class Brick{
     
             // Eval if this current for index is equal to brick with weapon capsule
             if (i == IS_BRICK_WITH_WEAPON_CAPSULE){
-                console.log("CAPUSLE IN BRICK NUMBER -> " + i);
+                //console.log("CAPUSLE IN BRICK NUMBER -> " + i);
                 arrayBricks[i].setCapsuleInside(true); // Mark the brick with the weapon capsule
             }
     

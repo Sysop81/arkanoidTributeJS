@@ -38,6 +38,8 @@ window.onload = function(){
             Capsule.loadCapsuleAsset(CANVAS,CTX);
             Shot.loadShotAsset(CANVAS,CTX);
             ModalScore.loadModalScoresAsset(LANGUAGE,Tools);
+            worldNumber = 0;
+            showWorldNumber = false;
             
             // Step 4. Show the game option menu
             idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
@@ -96,6 +98,12 @@ window.onload = function(){
         // Draw brick wall
         Brick.draw(CTX, bricks);
 
+        // Show world number
+        if(showWorldNumber){
+            showGameMsg(`${LANGUAGE.PLAYER_MSG.WORLD_NUMBER} ${worldNumber}`);
+            console.log("world " + worldNumber);
+        } 
+        
         // Draw player
         player.draw(CTX);
 
@@ -153,11 +161,28 @@ window.onload = function(){
         if(player.lives == 0) isStop = true;
         if(player.lives > 0 && player.score == bricks.length * 10){
             msg = LANGUAGE.PLAYER_MSG.WIN;
-            isStop = true;
+            
+            // Evaluate winner TODO COMPLETE THE INFINITY GAME MODE
+            isStop = menu.menuSelected == LANGUAGE.NEW_GAME_TYPE[0].TITLE ? true : worldNumber == 8;
+            if(menu.menuSelected != LANGUAGE.NEW_GAME_TYPE[0].TITLE){
+                clearInterval(idGame);
+                idGame = setInterval(outWallpaper,frameRate);
+                player.score = 0;
+                Shot.aShots = [];
+            }
+        }
+        
+        if(isStop){
+            clearInterval(idGame);
+            idGame = undefined;
+            console.log("GAME OVER");
+            showGameMsg(msg);
+
+            // Show score save modal
             let isShowModal = false;
             const scores = Tools.getLocalData();    
             for(let i = 0; i < scores.length; i++){
-                if(scores[0].score < player.score){
+                if(scores[0].score < player.accumulatedScore){
                     isShowModal = true;
                     modalScore.scoreIndex = i;
                     break;
@@ -166,17 +191,10 @@ window.onload = function(){
               
             if(isShowModal || scores.length === 0){
                 // Update modal score
-                modalScore.setScore(player.score);
+                modalScore.setScore(player.accumulatedScore);
                 // Show modal score
                 modalScore.show();
-            } 
-        }
-
-        if(isStop){
-            clearInterval(idGame);
-            idGame = undefined;
-            console.log("GAME OVER");
-            showGameMsg(msg);
+            }
         }
 
         return isStop;
@@ -188,7 +206,8 @@ window.onload = function(){
      */
     function updateGameMarker(){
         document.getElementById("lives").innerHTML = `${LANGUAGE.GAME_MARKER.LIVES}  ${player.lives}`; 
-        document.getElementById("score").firstElementChild.innerHTML = ` ${player.score}`;   
+        document.getElementById("score").firstElementChild.innerHTML = 
+            menu.menuSelected == LANGUAGE.NEW_GAME_TYPE[0].TITLE ? ` ${player.score}` : ` ${player.accumulatedScore}`;   
     }
     
     /**
@@ -230,7 +249,16 @@ window.onload = function(){
 				CTX.fillText(msg[1], (CANVAS.width / 2) - msg[1].length * 15, CANVAS.height / 2);  
 				CTX.font ="30px arcade";
 				CTX.fillText(LANGUAGE.PLAYER_MSG.RESET_GAME, (CANVAS.width / 2) - LANGUAGE.PLAYER_MSG.RESET_GAME.length * 6, Math.round((player.y / 1.1),0));
-                break;           
+                break; 
+            case `${LANGUAGE.PLAYER_MSG.WORLD_NUMBER} ${worldNumber}`:
+                CTX.fillStyle = "#000000";
+                CTX.font ="80px arcade";
+                const x = (CANVAS.width / 2) - msg.length * 20;
+                const y = (CANVAS.height / 2) / 1.30;
+                CTX.fillRect(x - 10, y - 70, CTX.measureText(msg).width + 20, 80);
+                CTX.fillStyle = "#FFFFFF";
+                CTX.fillText(msg, x, y);      
+                break;         
         }
     }
 
@@ -296,27 +324,29 @@ window.onload = function(){
 			case 13:
                 // ENTER
                 if(isGameRunning) return;
-                if(menu.menuSelected == LANGUAGE.OPTION_MENU[0].TITLE){
-                    // *** NEW GAME
+                if(menu.isShowingGameTypeMenu){
+                    console.log("GAME TYPE Selected -> " + menu.menuSelected);
+                    console.log("Game DIFICULT      -> " + menu.dificultSelected);
+
+                    // ** Generic parameters
                     isGameRunning = true;
-                    // Play the audio for start a new game.
                     menu.playAudioStartGame();
-                    console.log("Start a new game with dificulty -> " + menu.dificultSelected);
-                    // Load the bricks wall
-                    bricks = Brick.buildBrickWall(CANVAS,menu.dificultSelected,LANGUAGE);
 
                     // Build the player.
                     player = new Player(CANVAS,menu.dificultSelected,LANGUAGE);
 
-                    // Build the ball
-                    ball = new Ball(player);
-
                     // Clean a menu interval, and set a new interval with the transition to start a new game.
                     clearInterval(idGame);
-                    idGame = setInterval(outWallpaper,frameRate);   
+                    idGame = setInterval(outWallpaper,frameRate);
 
+                }else if(menu.menuSelected == LANGUAGE.OPTION_MENU[0].TITLE){
+                    // *** GAME TYPE
+                    menu.isShowingGameTypeMenu = true;
+                    menu.menuSelected = LANGUAGE.NEW_GAME_TYPE[0].TITLE;
+                    menu.menuIndex = -1;
+                    
                 }else if (menu.menuSelected == LANGUAGE.OPTION_MENU[1].TITLE){
-                    // *** GAME MODES
+                    // *** GAME DIFICULT MODES
                     menu.menuIndex = 1;
                     menu.menuItemIndex = LANGUAGE.DIFICULT.DIFICULT_MODES.findIndex(item => item.TITLE == menu.dificultSelected);
                     menu.menuSelected = menu.dificultSelected;
@@ -327,13 +357,15 @@ window.onload = function(){
                 break;
             case 27:
                 // ESC
-                menu.menuItemIndex = menu.menuIndex    
+                menu.menuItemIndex = menu.menuIndex < 0 ? 0 : menu.menuIndex    
                 menu.menuSelected = LANGUAGE.OPTION_MENU[menu.menuItemIndex].TITLE;
                 menu.menuIndex = 0;
+                menu.isShowingGameTypeMenu = false;
                 break;
             case 32:
                 // Space
-                if(ball != undefined && !ball.isBallActive) ball.setBallActive(true);     
+                if(ball != undefined && !ball.isBallActive) ball.setBallActive(true);   
+                if(showWorldNumber) showWorldNumber = false; 
                 break;    
             case 37:
                 // Left arrow (Player)
@@ -409,6 +441,7 @@ window.onload = function(){
         CANVAS.setAttribute("class","game0");
         menu.setAudioStatus(true);
         Shot.aShots = [];
+        worldNumber = -1;
         idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
     }
     
@@ -423,19 +456,22 @@ window.onload = function(){
 			CANVAS.setAttribute("style", `opacity: ${canvasOpacity}%`);
 		}else{
 
+            showWorldNumber = true;
+
+            // Load the bricks wall
+            bricks = Brick.buildBrickWall(CANVAS,menu.dificultSelected,LANGUAGE);
+
+            // Build the ball
+            ball = new Ball(player);
+
             // Change left gamePad arrows
             Tools.changeLeftGamePad(isGameRunning);
             
             // Clean the menu options
             CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
 
-			// Get a randon wallpaper && backgroud gradient
-            let numeroDeFondo = Math.floor(Math.random() * (8 - 0 + 1)) + 0;  
-			
-            // Set a canvas background && game marker with random CSS styles 
-            CANVAS.setAttribute("class",(`game${numeroDeFondo}`));
-            document.getElementById("gameMarker").setAttribute("style",
-                `background-image: linear-gradient(${gradients[numeroDeFondo - 1]});`);
+            // Select the game world based on the selected game type
+            setGameWorld();
 
             // Desactivate audio menu.
             menu.setAudioStatus(false);
@@ -473,6 +509,38 @@ window.onload = function(){
 		}
     }
 
+    /**
+     * setGameWorld
+     * This function sets the global variable worlNumber to a vule that represent the current world selected
+     */
+    function setGameWorld(){
+        switch(menu.menuSelected){
+            case LANGUAGE.NEW_GAME_TYPE[0].TITLE:
+                // Quick game. Get a randon wallpaper && backgroud gradient
+                worldNumber = Math.floor(Math.random() * (8 - 0 + 1)) + 0;
+                break;
+            default:
+                // Campaing and infinity
+                if(worldNumber > 8){
+                    worldNumber = 0;
+                }else{
+                    worldNumber ++;
+                }    
+        }
+        
+        //console.log("world number selected -> " + worldNumber);
+
+        // Set a canvas background && game marker with random CSS styles 
+        CANVAS.setAttribute("class",(`game${worldNumber}`));
+        document.getElementById("gameMarker").setAttribute("style",
+        `background-image: linear-gradient(${gradients[worldNumber - 1]});`);
+    }
+
+    function drawWorldNumber(){
+        idWorldTitle = setInterval(()=>{
+            showGameMsg(`WORLD ${worldNumber}`)
+        },60);
+    }
 
     /*********************************************************************                                                                                                                                          *
 	*         PROGRAM FLOW                                               *                                                                                                                                         *
@@ -502,6 +570,8 @@ window.onload = function(){
     let capsule = undefined;
     let isGameRunning = false; 
     let modalScore = undefined;
+    let worldNumber = undefined; 
+    let showWorldNumber = undefined;
 
     initialize();    
 }

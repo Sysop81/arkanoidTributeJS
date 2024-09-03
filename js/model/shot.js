@@ -94,6 +94,7 @@ export class Shot{
 
                             aBricks[i].brokenBrick = true;
                             player.score += 10;
+                            player.accumulatedScore += 10;
                         }
                         return true;
                     }

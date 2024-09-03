@@ -103,6 +103,7 @@ export class Ball {
 
             // Update the player score
 			player.score += 10; 
+            player.accumulatedScore += 10;
         }
     
 		if(this.x + this.reboundAngleX > canvas.width - this.ballSizeX || this.x + this.reboundAngleX < 0) {

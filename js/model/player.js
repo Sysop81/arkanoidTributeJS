@@ -18,6 +18,7 @@ export class Player{
         this.lives = 3;                             // Default initial lives of player
         this.score = 0;                             // Default initial score of player
         this.isShotActivate = false;                // Default initial shots of player
+        this.accumulatedScore = 0;                  // accumulated player score for game type CAMPAIGN and INFINITE
     }
     
     /**
