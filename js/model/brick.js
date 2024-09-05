@@ -33,10 +33,6 @@ export class Brick{
         Brick.prototype.image = new Image();
         Brick.prototype.image.src = `${window.location.pathname.replace(/\/$/, "")}/assets/img/sprites/bricks.png`;
         Brick.prototype.animation = [[0,0],[71,0],[143,0],[215,0]];
-        Brick.prototype.isMartianMode = 0;
-        Brick.prototype.isJRmode = 0;
-        Brick.prototype.jrModeScore = 150;
-        Brick.prototype.martianModeScore = 260;
     }
 
     
@@ -48,50 +44,15 @@ export class Brick{
      * @returns aray with the brick wall to draw in canvas
      */
     static buildBrickWall(canvas,gameMode,lang){
-        	
-        let arraySpecialMode;                   // This array contains the positions to draw the wall bricks in martianMode or JRMode
-        //let rowsBrickWall = 21;                 // Rows with bricks to build a wall bricks of the game. DEFAULT EASY MODE with 3 rows [7 bricks for row] (3 * 7 = 21)
         let bricksForRow = Math.floor(canvas.width  / 66.0);
-        const RESIDUAL_SPACE = canvas.width - (bricksForRow * 66.0); // TODO COMPLETE THIS METHOD IN MEDIUM AND HARD MODES
-        //console.log("RESIDUO: -> " + RESIDUAL_SPACE)
-        let bricksRows = 3;
-        Brick.prototype.jrModeScore = 0;        // Reset JR Mode score
-        Brick.prototype.martianModeScore = 0;   // Reset Martian Mode score
-    
+        const RESIDUAL_SPACE = canvas.width - (bricksForRow * 66.0); 
+        
         // Parameters of wall depending on game mode selected
-        if(gameMode == lang.DIFICULT.DIFICULT_MODES[1].TITLE){
-            // *** Medium mode
-            bricksRows = 5;
-            /*rowsBrickWall = 35; //5 rows [7 bricks for row] (5 * 7 = 35)
-    
-            //*** JR Mode [Only in medium mode].
-            Brick.prototype.isJRmode = Brick.#isSpecialGameMode();
-            console.log("JRmode is activate ? : " + (Brick.prototype.isJRmode == 1));
-    
-            if (Brick.prototype.isJRmode == 1){
-                // Set the brick wall map for JRMode and set scores.
-                arraySpecialMode = [0,0,1,0,1,1,1,0,0,1,0,1,0,1,0,0,1,0,1,1,1,1,0,1,0,1,1,0,1,1,1,0,1,0,1];
-                Brick.prototype.jrModeScore = 150;
-            }*/
-
-        }else if(gameMode == lang.DIFICULT.DIFICULT_MODES[2].TITLE){
-            // *** Hard mode
-            bricksRows = 7;
-            /*rowsBrickWall = 49; //7 rows with 7 bricks for row
-    
-            // ***  Martian Mode.
-            Brick.prototype.isMartianMode = Brick.#isSpecialGameMode();
-            console.log("Martian mode is activate ? : " + (Brick.prototype.isMartianMode == 1));
-    
-            if(Brick.prototype.isMartianMode == 1){
-                // Set the brick wall map for Martian Mode and set scores.
-                arraySpecialMode = [0,1,0,0,0,1,0,0,0,1,0,1,0,0,0,1,1,1,1,1,0,1,1,0,1,0,1,1,0,1,1,1,1,1,0,0,1,0,0,0,1,0,0,0,1,0,1,0,0];
-                Brick.prototype.martianModeScore = 260;
-            }*/
-        }
+        const BRICKS_ROWS = gameMode == lang.DIFICULT.DIFICULT_MODES[0].TITLE ? 3 :
+                                gameMode == lang.DIFICULT.DIFICULT_MODES[1].TITLE ? 5 : 7
 
         // Return a builded brickWall to draw in canvas
-        return Brick.#generateBrickWall(RESIDUAL_SPACE,bricksForRow,bricksRows,arraySpecialMode);
+        return Brick.#generateBrickWall(RESIDUAL_SPACE,bricksForRow,BRICKS_ROWS/*bricksRows*/);
     }
 
     /**
@@ -134,24 +95,12 @@ export class Brick{
     }
 
     /**
-     * isSpecialGameMode [Private]
-     * If this method returns 1 then a special mode is activated.
-     * Medium game mode -> Activate the JR mode.
-     * Hard game mode -> Activate the Martian mode. 
-     * @returns int
-     */
-    static #isSpecialGameMode(){
-        return Math.round(Math.random()*(10 - 1) + 1)
-    }
-
-    /**
      * generateBrickWall
      * This method build and return a finally brick wall.
-     * @param rowsBrickWall 
-     * @param arraySpecialMode 
+     * @param rowsBrickWall  
      * @returns array with brick wall
      */
-    static #generateBrickWall(RESIDUAL_SPACE,bricksOfRows,bricksRows,arraySpecialMode){ // rowsBrickWall
+    static #generateBrickWall(RESIDUAL_SPACE,bricksOfRows,bricksRows){ 
         // Internal vars
         const BRICKS_WALL = bricksOfRows * bricksRows;
         let arrayBricks = [];
@@ -177,16 +126,6 @@ export class Brick{
             // Update counter and instantiate a new object for brick wall
             cont++;
             arrayBricks.push(new Brick(positionX,positionY, Brick.prototype.animation[ARRAY_X_POSITIONS_OF_SPRITE[index]][0]));
-    
-            //Eval if the special game mode "JR mode" is activated and mark the brick as broken to draw the wall
-            /*if(Brick.prototype.isJRmode == 1 && arraySpecialMode[i] == 0){
-                arrayBricks[i].brokenBrick = true;
-            }
-    
-            //Eval if the special game mode "Martian mode" is activated and mark the brick as broken to draw the wall
-            if(Brick.prototype.isMartianMode == 1 && arraySpecialMode[i] == 0){
-                arrayBricks[i].brokenBrick = true;
-            }*/
     
             // Eval if this current for index is equal to brick with weapon capsule
             if (i == IS_BRICK_WITH_WEAPON_CAPSULE){

@@ -145,3 +145,15 @@ export function changeLeftGamePad(isPlayingGame){
         }
     });
 }
+
+/**
+ * removeAllClassThatStartWidth
+ * This function removes all css class that start width the target word
+ * @param {*} CANVAS 
+ * @param {*} word 
+ */
+export function removeAllClassThatStartWidth(CANVAS,word){
+    CANVAS.classList.forEach(cssClass =>{
+        if(cssClass.startsWith(word)) CANVAS.classList.remove(cssClass)
+    });
+}

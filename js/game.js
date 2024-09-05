@@ -38,7 +38,7 @@ window.onload = function(){
             Capsule.loadCapsuleAsset(CANVAS,CTX);
             Shot.loadShotAsset(CANVAS,CTX);
             ModalScore.loadModalScoresAsset(LANGUAGE,Tools);
-            worldNumber = 0;
+            worldNumber = -1;
             showWorldNumber = false;
             
             // Step 4. Show the game option menu
@@ -54,6 +54,9 @@ window.onload = function(){
             if(Tools.showGamePad()){
                 Tools.loadComponents("peripherals","gamepad.html")
                 .then(HTMLdata =>{
+                    // Change canvas container height size
+                    document.getElementById('myGameCanvas').classList.add('canvas-short');
+
                     // Set HTML pad in the container
                     document.getElementById("gamePadContainer").innerHTML = HTMLdata;
                     // Adding handlers
@@ -99,11 +102,8 @@ window.onload = function(){
         Brick.draw(CTX, bricks);
 
         // Show world number
-        if(showWorldNumber){
-            showGameMsg(`${LANGUAGE.PLAYER_MSG.WORLD_NUMBER} ${worldNumber}`);
-            console.log("world " + worldNumber);
-        } 
-        
+        if(showWorldNumber) showGameMsg(`${LANGUAGE.PLAYER_MSG.WORLD_NUMBER} ${worldNumber}`);
+         
         // Draw player
         player.draw(CTX);
 
@@ -131,7 +131,6 @@ window.onload = function(){
                         player.setSpriteAnimation(menu.dificultSelected,LANGUAGE,false);
                     },PLAYER_SHOOTING_TIME);
 
-                    
                     // Change a player sprite
                     player.setSpriteAnimation(menu.dificultSelected,LANGUAGE,true);
                 }
@@ -150,7 +149,6 @@ window.onload = function(){
         }
     }
 
-
     /**
      * checkGameStatus
      * @returns true or false
@@ -162,8 +160,10 @@ window.onload = function(){
         if(player.lives > 0 && player.score == bricks.length * 10){
             msg = LANGUAGE.PLAYER_MSG.WIN;
             
-            // Evaluate winner TODO COMPLETE THE INFINITY GAME MODE
-            isStop = menu.menuSelected == LANGUAGE.NEW_GAME_TYPE[0].TITLE ? true : worldNumber == 8;
+            // Evaluate stop game based on game type
+            isStop = menu.menuSelected == LANGUAGE.NEW_GAME_TYPE[0].TITLE ? true :
+                        menu.menuSelected == LANGUAGE.NEW_GAME_TYPE[1].TITLE ? false : worldNumber == 8;
+            // Only for infinite and campaign
             if(menu.menuSelected != LANGUAGE.NEW_GAME_TYPE[0].TITLE){
                 clearInterval(idGame);
                 idGame = setInterval(outWallpaper,frameRate);
@@ -268,17 +268,6 @@ window.onload = function(){
      * @param {*} evt 
      */
     function manageTouchStart(evt){
-
-        const KEY_ACTIONS = {
-            pUp : {keyCode:38},
-            pDown:{keyCode:40},
-            pEsc :{keyCode:27},
-            pSpc :{keyCode:32},
-            pEnt :{keyCode:13},
-            pZ : {charCode:90},
-            pR : {keyCode:82}
-        };
-
         switch(evt.target.id){
             case 'pLeft':
                 Player.prototype.xLeft = true;
@@ -312,7 +301,6 @@ window.onload = function(){
         }
     }
 
-    
     /**
      * manageKeyDown [Handler]
      * Manage key down listener on the game
@@ -324,9 +312,17 @@ window.onload = function(){
 			case 13:
                 // ENTER
                 if(isGameRunning) return;
+                if(menu.menuSelected  == LANGUAGE.DIFICULT.DIFICULT_MODES[0].TITLE ||
+                    menu.menuSelected  == LANGUAGE.DIFICULT.DIFICULT_MODES[1].TITLE ||
+                    menu.menuSelected  == LANGUAGE.DIFICULT.DIFICULT_MODES[2].TITLE
+                ){    
+                    manageKeyDown(KEY_ACTIONS.pEsc);
+                    return;
+                }
                 if(menu.isShowingGameTypeMenu){
-                    console.log("GAME TYPE Selected -> " + menu.menuSelected);
-                    console.log("Game DIFICULT      -> " + menu.dificultSelected);
+                    // *** Loading GAME
+                    //console.log("GAME TYPE Selected -> " + menu.menuSelected);
+                    //console.log("Game DIFICULT      -> " + menu.dificultSelected);
 
                     // ** Generic parameters
                     isGameRunning = true;
@@ -438,7 +434,8 @@ window.onload = function(){
         document.getElementById('mPlayerName').disabled = false;
         document.getElementById("lives").innerHTML = `${LANGUAGE.GAME_MARKER.LIVES}  3`; 
         document.getElementById("score").firstElementChild.innerHTML = 0;  
-        CANVAS.setAttribute("class","game0");
+        Tools.removeAllClassThatStartWidth(CANVAS,'game');
+        CANVAS.classList.add("game0");
         menu.setAudioStatus(true);
         Shot.aShots = [];
         worldNumber = -1;
@@ -455,7 +452,7 @@ window.onload = function(){
 		if(canvasOpacity > 0){
 			CANVAS.setAttribute("style", `opacity: ${canvasOpacity}%`);
 		}else{
-
+            // Enable info num of world
             showWorldNumber = true;
 
             // Load the bricks wall
@@ -521,32 +518,36 @@ window.onload = function(){
                 break;
             default:
                 // Campaing and infinity
-                if(worldNumber > 8){
+                if(worldNumber >= 8){
                     worldNumber = 0;
                 }else{
                     worldNumber ++;
                 }    
         }
         
-        //console.log("world number selected -> " + worldNumber);
-
         // Set a canvas background && game marker with random CSS styles 
-        CANVAS.setAttribute("class",(`game${worldNumber}`));
+        Tools.removeAllClassThatStartWidth(CANVAS,'game');
+        CANVAS.classList.add((`game${worldNumber}`));
+
         document.getElementById("gameMarker").setAttribute("style",
         `background-image: linear-gradient(${gradients[worldNumber - 1]});`);
     }
 
-    function drawWorldNumber(){
-        idWorldTitle = setInterval(()=>{
-            showGameMsg(`WORLD ${worldNumber}`)
-        },60);
-    }
 
     /*********************************************************************                                                                                                                                          *
 	*         PROGRAM FLOW                                               *                                                                                                                                         *
 	**********************************************************************/
     
     // Global var
+    const KEY_ACTIONS = {
+        pUp : {keyCode:38},
+        pDown:{keyCode:40},
+        pEsc :{keyCode:27},
+        pSpc :{keyCode:32},
+        pEnt :{keyCode:13},
+        pZ : {charCode:90},
+        pR : {keyCode:82}
+    };
     const PLAYER_SHOOTING_TIME = 5000;
     const GAME_LOOP_KEY_FRAME = 10;
     const CANVAS = document.getElementById("myGameCanvas");

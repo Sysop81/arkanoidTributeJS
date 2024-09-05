@@ -145,7 +145,7 @@ export class Menu{
         let menuOptions = undefined;
         switch(this.menuIndex){
             case -1:
-                // Game type [Testing]
+                // Game type
                 menuOptions = this.lang.NEW_GAME_TYPE;
                 break;
             case 0:
