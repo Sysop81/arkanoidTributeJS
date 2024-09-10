@@ -37,16 +37,17 @@ export class Capsule{
      * Later if Y capsule position is grater than canvas height the capsule is destroy 
      */
     loadAnimation(){
+        
         this.positionOfMatrixAnimation = this.positionOfMatrixAnimation < this.animation.length - 1 ? this.positionOfMatrixAnimation + 1 : 0;
         
-        if(this != undefined && this.y < this.canvas.height){
+        if(this.idAnimation != undefined && this.isEnabled && this.y < this.canvas.height){
             this.draw();
-            this.y ++;
+            this.y += 0.05;
+            requestAnimationFrame(this.loadAnimation.bind(this));
         }else{
             this.destroy();
         }
     }
-
 
     /**
      * destroy
@@ -92,5 +93,6 @@ export class Capsule{
         Capsule.prototype.idAnimation = undefined;
         Capsule.prototype.audioCapsuleDescending = document.getElementById("descendingcapsule");
         Capsule.prototype.audiogetCapsule = document.getElementById("playerCollectCapsule");
+        Capsule.prototype.idAnimationFrame = undefined;
     }
 }

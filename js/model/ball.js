@@ -42,8 +42,7 @@ export class Ball {
                      this.x,                                            // Display X position to draw the ball
                      this.y,	                                        // Display Y position to darw the ball
                      this.ballSizeX,		                            // Size X of the ball
-                     this.ballSizeY);                                   // Size Y of the ball
-                       
+                     this.ballSizeY);                                   // Size Y of the ball               
    }
    
    /**
@@ -77,7 +76,7 @@ export class Ball {
             // Show the explosion brick animation
             let explosion = new Explosion(Explosion.EXPLOSION_TYPES.STAR,bricks[Explosion.lastHitBrickIndex].x,bricks[Explosion.lastHitBrickIndex].y);
             if(explosion.idAnimationStar == undefined){
-                explosion.idAnimationStar = setInterval(explosion.loadAnimate.bind(explosion),10);
+                explosion.idAnimationStar = setInterval(explosion.loadAnimate.bind(explosion),30); 
             } 
 					
 			// Check if hit brick contains the weapon capsule
@@ -86,7 +85,7 @@ export class Ball {
 				capsule.playCapsuleDescendingAudio();
 
                 // Load animation
-                capsule.idAnimation = setInterval(capsule.loadAnimation.bind(capsule), 10);
+                capsule.idAnimation = setInterval(capsule.loadAnimation.bind(capsule), 30);    
 			}
 
             // Mark a brick as broken
@@ -133,7 +132,7 @@ export class Ball {
             // Load Death animation
             let deathExplosion = new Explosion(Explosion.EXPLOSION_TYPES.DEATH, ((canvas.width / 2) - 150), canvas.height - 200);
             if(deathExplosion.idAnimationDeath == undefined){
-                deathExplosion.idAnimationDeath = setInterval(deathExplosion.loadAnimate.bind(deathExplosion),10);
+                deathExplosion.idAnimationDeath = setInterval(deathExplosion.loadAnimate.bind(deathExplosion),30);
             } 
 
             // Update the player lives

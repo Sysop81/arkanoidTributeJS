@@ -29,8 +29,12 @@
         "START_GAME": "PRESS    SPACE   TO  START",
         "WIN" : " !! YOU   WIN   !!",
         "GAME_OVER" : [" GAME ", " OVER "],
-        "WEAPONS" : "PRESS  Z   TO  SHOOT",
-        "WORLD_NUMBER" : "WORLD"
+        "WEAPONS" : "PRESS  'Z'   TO  SHOOT",
+        "WORLD_NUMBER" : "WORLD",
+        "PAUSED" : {
+            "TITLE" : "PAUSED",
+            "KEY_RELEASE" : "PRESS  'ESC'  TO  RESUME"
+        }
     },
     "MODAL":{
         "TITLE": "SET YOUR RECORD",
@@ -51,6 +55,13 @@
         "BUTTON":{
             "SAVE": "SAVE",
             "CLOSE": "CLOSE"
+        }
+    },
+    "GAME_PAD":{
+        "KEYS":{
+            "ESCAPE": "ESC",
+            "SPACE" : "SPA",
+            "ENTER" : "ENT"
         }
     }
 }

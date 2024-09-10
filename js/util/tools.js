@@ -157,3 +157,19 @@ export function removeAllClassThatStartWidth(CANVAS,word){
         if(cssClass.startsWith(word)) CANVAS.classList.remove(cssClass)
     });
 }
+
+/**
+ * activateFullScreen
+ * This function activates a fullscreen mode
+ */
+export function activateFullScreen(){
+    let element = document.documentElement
+        
+    if(element.requestFullScreen) {
+        element.requestFullScreen();
+    } else if(element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+    } else if(element.webkitRequestFullScreen) {
+        element.webkitRequestFullScreen();
+    }    
+}

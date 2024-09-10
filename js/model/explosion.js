@@ -48,15 +48,17 @@ export class Explosion{
      * This method calculate the positions of sprite animation on base of the animation type. 
      * Later draw the game object in canvas and finally reset the animation.
      */
-    loadAnimate(){
+    loadAnimate(){ 
         if(this.positionOfMatrixAnimation < (this.type == Explosion.EXPLOSION_TYPES.STAR ? this.animationStar.length : 
             this.type == Explosion.EXPLOSION_TYPES.SHOT ? this.animationShot.length : this.animationDeath.length)){
             // Increment sprite frame && draw in canvas
             this.draw();
             this.positionOfMatrixAnimation++;
+            requestAnimationFrame(this.loadAnimate.bind(this));
         }else{
             // Reset and clear interval animation
             this.positionOfMatrixAnimation = 0;
+           
             switch(this.type){
                 case Explosion.EXPLOSION_TYPES.STAR:
                     clearInterval(this.idAnimationStar);
@@ -64,11 +66,11 @@ export class Explosion{
                     break;
                 case Explosion.EXPLOSION_TYPES.SHOT:
                     clearInterval(this.idAnimationShot);
-                    this.animationShot = undefined;
+                    this.idAnimationShot = undefined;
                     break;
                 default:
                     clearInterval(this.idAnimationDeath);
-                    this.animationDeath = undefined;
+                    this.idAnimationDeath = undefined;
             }
         }
     }

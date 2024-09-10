@@ -13,6 +13,7 @@ import { Explosion } from "./model/explosion.js";
 import { Capsule } from "./model/capsule.js";
 import { Shot } from "./model/shot.js";
 import { ModalScore } from "./components/modal.js";
+import { Performance } from "./util/model/performance.js";
 
 window.onload = function(){
     
@@ -21,6 +22,7 @@ window.onload = function(){
      * This function initializes the video game
      */
     function initialize(){
+        
         // Step 1. Set canvas sizes
         Tools.setCanvasMeasures(CANVAS);
 
@@ -40,9 +42,10 @@ window.onload = function(){
             ModalScore.loadModalScoresAsset(LANGUAGE,Tools);
             worldNumber = -1;
             showWorldNumber = false;
+            localPerformance = new Performance();
             
             // Step 4. Show the game option menu
-            idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
+            idGame = setInterval(menu.showGameMenu.bind(menu),FRAME_RATE);
             
             // Step 5. Handlers
             document.addEventListener('keydown',manageKeyDown,false);
@@ -59,6 +62,12 @@ window.onload = function(){
 
                     // Set HTML pad in the container
                     document.getElementById("gamePadContainer").innerHTML = HTMLdata;
+
+                    // Adding language to gamepada keys
+                    document.getElementById("pEsc").innerHTML = LANGUAGE.GAME_PAD.KEYS.ESCAPE;
+                    document.getElementById("pSpc").innerHTML = LANGUAGE.GAME_PAD.KEYS.SPACE;
+                    document.getElementById("pEnt").innerHTML = LANGUAGE.GAME_PAD.KEYS.ENTER;
+                    
                     // Adding handlers
                     document.querySelectorAll('.btn').forEach(btn=>{
                         btn.addEventListener('touchstart',manageTouchStart,false);
@@ -89,14 +98,19 @@ window.onload = function(){
             console.error('Error loading language:', error);
         });
     }
-
+    
     /**
      * gameLoop
      * This is the main function that updates all game object
      */
     function gameLoop(){
+        
         // Clear canvas
         CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
+
+        // FPS
+        localPerformance.calculateFPS(performance.now());
+        showGameMsg(`${localPerformance.getFPS()} FPS`);
 
         // Draw brick wall
         Brick.draw(CTX, bricks);
@@ -112,40 +126,49 @@ window.onload = function(){
 
         // Check game over
         if(!checkGameStatus()){
-            // Check the ball moving
-            if(ball.isBallActive){
-                ball.checkBallCollider(CANVAS,player,bricks,capsule);
-                updateGameMarker();
-
-                if(capsule.isEnabled && player.getShotCapsule(capsule)){
-                    // Plays player get capsule audio
-                    capsule.playGetCapsuleAudio();
-
-                    // Destroy capsule.
-                    capsule.destroy();
-                    
-                    // Activate the player shot && set timeout to end the shooting time
-                    player.activateShots(true);
-                    setTimeout(()=>{
-                        player.activateShots(false);
-                        player.setSpriteAnimation(menu.dificultSelected,LANGUAGE,false);
-                    },PLAYER_SHOOTING_TIME);
-
-                    // Change a player sprite
-                    player.setSpriteAnimation(menu.dificultSelected,LANGUAGE,true);
-                }
-                
-                // Check if player shots is enabled
-                if(player.isShotActivate){
-                    showGameMsg(LANGUAGE.PLAYER_MSG.WEAPONS);
-                    Shot.moveShots(bricks,player);
-                }
-
+            
+            if(isGamePaused){
+                showGameMsg(LANGUAGE.PLAYER_MSG.PAUSED.TITLE);
             }else{
-                // Game is Stopped
-                showGameMsg(LANGUAGE.PLAYER_MSG.START_GAME);
-                setPlayerAndBallTogether();
+            
+                // Check the ball moving
+                if(ball.isBallActive){
+                    
+                    ball.checkBallCollider(CANVAS,player,bricks,capsule);
+                    updateGameMarker();
+
+                    if(capsule.isEnabled && player.getShotCapsule(capsule)){
+                        // Plays player get capsule audio
+                        capsule.playGetCapsuleAudio();
+
+                        // Destroy capsule.
+                        capsule.destroy();
+                        
+                        // Activate the player shot && set timeout to end the shooting time
+                        player.activateShots(true);
+                        setTimeout(()=>{
+                            player.activateShots(false);
+                            player.setSpriteAnimation(menu.dificultSelected,LANGUAGE,false);
+                        },PLAYER_SHOOTING_TIME);
+
+                        // Change a player sprite
+                        player.setSpriteAnimation(menu.dificultSelected,LANGUAGE,true);
+                    }
+                    
+                    // Check if player shots is enabled
+                    if(player.isShotActivate){
+                        showGameMsg(LANGUAGE.PLAYER_MSG.WEAPONS);
+                        Shot.moveShots(bricks,player);
+                    }
+
+                }else{
+                    // Game is Stopped
+                    showGameMsg(LANGUAGE.PLAYER_MSG.START_GAME);
+                    setPlayerAndBallTogether();
+                }
             }
+
+            idGame = requestAnimationFrame(gameLoop)
         }
     }
 
@@ -160,20 +183,24 @@ window.onload = function(){
         if(player.lives > 0 && player.score == bricks.length * 10){
             msg = LANGUAGE.PLAYER_MSG.WIN;
             
-            // Evaluate stop game based on game type
+            // Evaluate stop game based on game type 
             isStop = menu.menuSelected == LANGUAGE.NEW_GAME_TYPE[0].TITLE ? true :
                         menu.menuSelected == LANGUAGE.NEW_GAME_TYPE[1].TITLE ? false : worldNumber == 8;
+            
             // Only for infinite and campaign
-            if(menu.menuSelected != LANGUAGE.NEW_GAME_TYPE[0].TITLE){
-                clearInterval(idGame);
-                idGame = setInterval(outWallpaper,frameRate);
+            if(!isStop && menu.menuSelected != LANGUAGE.NEW_GAME_TYPE[0].TITLE){
+                // Load new world
+                cancelAnimationFrame(idGame);
+                idGame = setInterval(outWallpaper,FRAME_RATE);
                 player.score = 0;
                 Shot.aShots = [];
+                return true;
             }
         }
         
+        // All modes when game is end
         if(isStop){
-            clearInterval(idGame);
+            cancelAnimationFrame(idGame);
             idGame = undefined;
             console.log("GAME OVER");
             showGameMsg(msg);
@@ -258,7 +285,17 @@ window.onload = function(){
                 CTX.fillRect(x - 10, y - 70, CTX.measureText(msg).width + 20, 80);
                 CTX.fillStyle = "#FFFFFF";
                 CTX.fillText(msg, x, y);      
-                break;         
+                break;
+            case LANGUAGE.PLAYER_MSG.PAUSED.TITLE :
+                CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
+                CTX.font ="80px arcade";   
+				CTX.fillText(msg, (CANVAS.width / 2) - msg.length * 20, (CANVAS.height / 2) / 1.30);    
+				CTX.font ="24px arcade";
+				CTX.fillText(LANGUAGE.PLAYER_MSG.PAUSED.KEY_RELEASE, (CANVAS.width / 2) - LANGUAGE.PLAYER_MSG.PAUSED.KEY_RELEASE.length * 5, Math.round((player.y / 1.1),0));
+            break;    
+            default:
+                // FPS
+                CTX.fillText(msg, 0, CANVAS.height - 10);               
         }
     }
 
@@ -333,7 +370,7 @@ window.onload = function(){
 
                     // Clean a menu interval, and set a new interval with the transition to start a new game.
                     clearInterval(idGame);
-                    idGame = setInterval(outWallpaper,frameRate);
+                    idGame = setInterval(outWallpaper,FRAME_RATE);
 
                 }else if(menu.menuSelected == LANGUAGE.OPTION_MENU[0].TITLE){
                     // *** GAME TYPE
@@ -353,6 +390,12 @@ window.onload = function(){
                 break;
             case 27:
                 // ESC
+
+                if(isGameRunning){
+                    isGamePaused = !isGamePaused;
+                    return;
+                }     
+            
                 menu.menuItemIndex = menu.menuIndex < 0 ? 0 : menu.menuIndex    
                 menu.menuSelected = LANGUAGE.OPTION_MENU[menu.menuItemIndex].TITLE;
                 menu.menuIndex = 0;
@@ -360,6 +403,8 @@ window.onload = function(){
                 break;
             case 32:
                 // Space
+                if(!isGameRunning) Tools.activateFullScreen();
+
                 if(ball != undefined && !ball.isBallActive) ball.setBallActive(true);   
                 if(showWorldNumber) showWorldNumber = false; 
                 break;    
@@ -382,7 +427,7 @@ window.onload = function(){
                 if(menu.menuIndex == 2) return;
                 menu.playAudioOpMenu();
                 menu.manageOpMenu(true)
-                break;
+                break;   
             case 82:
                 // R key
                 restartGame();
@@ -439,7 +484,7 @@ window.onload = function(){
         menu.setAudioStatus(true);
         Shot.aShots = [];
         worldNumber = -1;
-        idGame = setInterval(menu.showGameMenu.bind(menu),frameRate);
+        idGame = setInterval(menu.showGameMenu.bind(menu),FRAME_RATE);
     }
     
     /**
@@ -502,7 +547,7 @@ window.onload = function(){
 		}else{
             // Clear interval initial animate && load gameLoop
 			clearInterval(idGame);
-			idGame = setInterval(gameLoop, GAME_LOOP_KEY_FRAME);
+            idGame = requestAnimationFrame(gameLoop);
 		}
     }
 
@@ -553,7 +598,7 @@ window.onload = function(){
     const CANVAS = document.getElementById("myGameCanvas");
     const CTX = CANVAS.getContext("2d");
     let LANGUAGE = undefined;
-    let frameRate = 50;
+    const FRAME_RATE = 50;
     let canvasOpacity = 100;
     let gradients = ["",
                      "black,grey,black", 
@@ -569,10 +614,13 @@ window.onload = function(){
     let player = undefined;
     let ball = undefined;
     let capsule = undefined;
-    let isGameRunning = false; 
+    let isGameRunning = false;
+    let isGamePaused = false; 
     let modalScore = undefined;
     let worldNumber = undefined; 
     let showWorldNumber = undefined;
+    let localPerformance = undefined;    
+    
 
     initialize();    
 }
